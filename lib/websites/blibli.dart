@@ -1,9 +1,12 @@
 import 'package:http/http.dart' as http;
-import 'package:html/parser.dart';
-import 'image_model.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
+import '../image_model.dart';
 import 'dart:developer';
 
-class Bukalapak {
+class Blibli {
   String search;
   int searchLength;
 
@@ -11,96 +14,80 @@ class Bukalapak {
     search = searches;
     search = search.replaceAll(' ', '%20');
 
-    var html = await getHtml(page: 0);
-    html = parse(html);
-    var a = html.querySelectorAll(
-        '#display_product_search > div.product-pagination-wrapper > div.pagination > span.last-page');
-    dynamic total = int.parse(a[0].text) * 50;
+    var json = await getJson(page: 0);
+    var total = json['data']['paging']['total_item'];
     total = '$total'.replaceAllMapped(
         new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
     return total;
   }
 
-  Future<List<ImageModel>> getBukalapak({String searches, int page}) async {
+  Future<List<ImageModel>> getBlibli({String searches, int page}) async {
     search = searches;
     search = search.replaceAll(' ', '%20');
 
-    var html = await getHtml(page: page);
-    html = parse(html);
-    List<ImageModel> items = getData(html: html);
-//    for (int x = 0; x < items.length; x++) {
-//      print(items[x].img);
-//    }
+    var json = await getJson(page: page);
+    List<ImageModel> items = getData(json: json);
+
     return items;
   }
 
-  List<ImageModel> getData({var html}) {
+  List<ImageModel> getData({var json}) {
     List<ImageModel> items = [];
-    List element = html.querySelectorAll('li.col-12--2');
-    log('Bukalapak received ${element.length} elements from html');
-    for (int x = 0; x < element.length; x++) {
+    for (int x = 0; x < searchLength; x++) {
       ImageModel imageModel = ImageModel();
-      var nameElement = element[x]
-          .querySelector('div.product-card > article > div.product-media > a');
-      var priceElement = element[x].querySelector(
-          'div.product-card > article > div.product-description > div.product-price');
-      var imgElement = element[x].querySelector(
-          'div.product-card > article > div.product-media > a > picture > img');
-      imageModel.title = nameElement.attributes['title'];
-      imageModel.url =
-          ('https://www.bukalapak.com' + nameElement.attributes['href']);
-      dynamic tempPrice = priceElement.attributes['data-reduced-price'];
+
+      String tempPrice =
+          json['data']['products'][x]['price']['minPrice'].toStringAsFixed(0);
       tempPrice = '$tempPrice'.replaceAllMapped(
           new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      imageModel.title = json['data']['products'][x]['name'];
       imageModel.price = tempPrice;
-      imageModel.img = imgElement.attributes['data-src'];
-      imageModel.website = 'Bukalapak';
+      imageModel.url =
+          'https://www.blibli.com' + json['data']['products'][x]['url'];
+      imageModel.img = json['data']['products'][x]['images'][0];
+      imageModel.website = 'Blibli';
 
-      if (imageModel.img.contains('jpg') ||
-          imageModel.img.contains('jpeg') ||
-          imageModel.img.contains('png')) {
-        items.add(imageModel);
-      } else {
-        imageModel.img =
-            'https://miro.medium.com/max/1400/1*pUEZd8z__1p-7ICIO1NZFA.png';
-        items.add(imageModel);
-      }
+      items.add(imageModel);
     }
-    log('Bukalapak returning list of length ${items.length}');
-    return (items);
+    return items;
   }
 
-  Future<dynamic> getHtml({int page}) async {
+  Future<dynamic> getJson({int page}) async {
+    int start = page * 32;
     http.Response response = await http.get(
-        'https://www.bukalapak.com/products/s?from=omnisearch&from_keyword_history=false&page=$page&search%5Bkeywords%5D=$search&search_source=omnisearch_organic&source=navbar&utf8=✓');
+        'https://www.blibli.com/backend/search/products?page=$page&start=$start&searchTerm=$search&intent=false&merchantSearch=true&multiCategory=true&customUrl=&sort=0&channelId=mobile-web&catIntent=false&showFacet=true');
 
     if (response.statusCode == 200) {
       String data = response.body;
-      return data;
+
+      dynamic json = jsonDecode(data);
+      searchLength = json['data']['products'].length;
+      return json;
     } else {
-      throw Exception('Bukalapak error: statusCode= ${response.statusCode}');
+      throw Exception('Blibli error: statusCode= ${response.statusCode}');
     }
   }
 }
+
 //
-//class BukalapakGridView extends StatefulWidget {
+//class BlibliGridView extends StatefulWidget {
 //  final search;
-//  static const int PAGE_SIZE = 50;
+//  static int PAGE_SIZE = 32;
 //
-//  BukalapakGridView({Key key, @required this.search}) : super(key: key);
+//  BlibliGridView({Key key, @required this.search}) : super(key: key);
 //
 //  @override
-//  _BukalapakGridViewState createState() => _BukalapakGridViewState();
+//  _BlibliGridViewState createState() => _BlibliGridViewState();
 //}
 //
-//class _BukalapakGridViewState extends State<BukalapakGridView>
-//    with AutomaticKeepAliveClientMixin<BukalapakGridView> {
-//  Bukalapak bukalapak = Bukalapak();
+//class _BlibliGridViewState extends State<BlibliGridView>
+//    with AutomaticKeepAliveClientMixin<BlibliGridView> {
+//  Blibli blibli = Blibli();
 //
 //  @override
 //  Widget build(BuildContext context) {
 //    return PagewiseGridView.count(
-//      pageSize: BukalapakGridView.PAGE_SIZE,
+//      pageSize: BlibliGridView.PAGE_SIZE,
 //      crossAxisCount: 3,
 //      mainAxisSpacing: 8.0,
 //      crossAxisSpacing: 8.0,
@@ -125,8 +112,8 @@ class Bukalapak {
 //      },
 //      itemBuilder: this._itemBuilder,
 //      pageFuture: (pageIndex) {
-//        log('Loading next Bukalapak page');
-//        return bukalapak.getBukalapak(page: pageIndex, searches: widget.search);
+//        log('Loading next Blibli page');
+//        return blibli.getBlibli(page: pageIndex, searches: widget.search);
 //      },
 //    );
 //  }

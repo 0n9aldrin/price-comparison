@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pricecomparison/fancy_fab.dart';
 import 'package:pricecomparison/image_model.dart';
-import 'blibli.dart';
-import 'tokopedia.dart' as tok;
+import 'websites/blibli.dart';
+import 'websites/tokopedia.dart' as tok;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'Item.dart';
 import 'dart:developer';
-import 'ebay.dart';
-import 'bukalapak.dart';
+import 'websites/ebay.dart';
+import 'websites/bukalapak.dart';
 import 'combined.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';

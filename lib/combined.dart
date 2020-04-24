@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'bukalapak.dart';
-import 'ebay.dart';
-import 'blibli.dart';
-import 'tokopedia.dart' as tok;
+import 'websites/bukalapak.dart';
+import 'websites/ebay.dart';
+import 'websites/blibli.dart';
+import 'websites/tokopedia.dart' as tok;
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'image_model.dart';

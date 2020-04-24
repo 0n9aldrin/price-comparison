@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'image_model.dart';
+import '../image_model.dart';
 import 'dart:developer';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 

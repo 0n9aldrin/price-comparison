@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
-import 'image_model.dart';
+import '../image_model.dart';
 
 class Ebay {
   String search;
