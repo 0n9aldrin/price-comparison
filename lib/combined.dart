@@ -1,96 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:pricecomparison/websites/shopee.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'Item.dart';
 import 'websites/bukalapak.dart';
 import 'websites/ebay.dart';
 import 'websites/blibli.dart';
 import 'websites/tokopedia.dart' as tok;
-import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'image_model.dart';
 import 'dart:developer';
-
-//class Combined extends StatefulWidget {
-//  Combined({Key key, this.search}) : super(key: key);
-//  String search;
-//
-//  @override
-//  _CombinedState createState() => _CombinedState();
-//}
-//
-//class _CombinedState extends State<Combined> {
-//  CombineHelper combineHelper = CombineHelper();
-//  Widget _appBarTitle = Text('Combined Search');
-//  Icon _searchIcon = Icon(
-//    Icons.search,
-//    color: Colors.white,
-//  );
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: _appBarTitle,
-//        actions: <Widget>[
-//          IconButton(
-//              icon: _searchIcon,
-//              onPressed: () {
-//                setState(() {
-//                  if (_searchIcon.icon == Icons.search) {
-//                    _appBarTitle = TextField(
-//                      decoration: new InputDecoration(hintText: 'Search...'),
-//                    );
-//                    _searchIcon = Icon(
-//                      Icons.close,
-//                      color: Colors.white,
-//                    );
-//                  } else {
-//                    _searchIcon = Icon(
-//                      Icons.search,
-//                      color: Colors.white,
-//                    );
-//                    _appBarTitle = Text('Combined Search');
-//                  }
-//                });
-//              })
-//        ],
-//      ),
-//      body: Column(
-//        children: <Widget>[
-//          Expanded(
-//              child: CombinedGridView(
-//            search: widget.search,
-//          )),
-//          FutureBuilder(
-//            builder: (context, snapshot) {
-//              return Container(
-//                color: Colors.grey,
-//                height: 28.0,
-//                padding: EdgeInsets.only(right: 20.0),
-//                child: Align(
-//                    alignment: Alignment.centerRight,
-//                    child: Text('Total results: ${snapshot.data}')),
-//              );
-//            },
-//            future: combineHelper.combineTotal(search: widget.search),
-//          ),
-//        ],
-//      ),
-//      floatingActionButton: FloatingActionButton.extended(
-//        onPressed: () {
-//          // sort
-//        },
-//        backgroundColor: Colors.redAccent,
-//        label: Text('Filter'),
-//        icon: Icon(Icons.filter_list),
-//      ),
-//    );
-//  }
-//}
+import 'main.dart';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 
 class CombineHelper {
   tok.Tokopedia tokopedia = tok.Tokopedia();
   Ebay ebay = Ebay();
   Bukalapak bukalapak = Bukalapak();
   Blibli blibli = Blibli();
+  Shopee shopee = Shopee();
 
   List<ImageModel> combinedList = [];
   int combinedTotal;
@@ -100,14 +27,15 @@ class CombineHelper {
     var tokopediaList =
         await tokopedia.getTokopedia(searches: search, page: page);
     log('Combined Tokopedia: ${tokopediaList.length}/60');
-    var ebayList =
-        await ebay.getEbay(searches: search, page: page, combine: true);
+    var ebayList = await ebay.getEbay(searches: search, page: page);
     log('Combined Ebay: ${ebayList.length}/62');
     var bukalapakList =
         await bukalapak.getBukalapak(searches: search, page: page);
     log('Combined Bukalapak: ${bukalapakList.length}/50');
     var blibliList = await blibli.getBlibli(searches: search, page: page);
     log('Combined Blibli: ${blibliList.length}/32');
+    var shopeeList = await shopee.getShopee(searches: search, page: page);
+    log('Combined Shopee: ${shopeeList.length}/50');
 
     for (int x = 0; x < (tokopediaList.length); x++) {
       tokopediaList[x].price = tokopediaList[x].price.replaceAll(',', '');
@@ -125,6 +53,12 @@ class CombineHelper {
       blibliList[x].price = blibliList[x].price.replaceAll(',', '');
       blibliList[x].price = int.parse(blibliList[x].price);
       combinedList.add(blibliList[x]);
+    }
+
+    for (int x = 0; x < (shopeeList.length); x++) {
+      shopeeList[x].price = shopeeList[x].price.replaceAll(',', '');
+      shopeeList[x].price = int.parse(shopeeList[x].price);
+      combinedList.add(shopeeList[x]);
     }
 
     for (int x = 0; x < (bukalapakList.length); x++) {
@@ -210,202 +144,142 @@ class CombineHelper {
     return combinedTotal;
   }
 }
-//
-//class CombinedGridView extends StatefulWidget {
-//  final search;
-//  static int PAGE_SIZE = 205;
-//
-//  CombinedGridView({Key key, @required this.search}) : super(key: key);
-//
+
+class CombinedGridView extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _CombinedGridViewState();
+  }
+}
+
+class _CombinedGridViewState extends State<CombinedGridView>
+    with AutomaticKeepAliveClientMixin<CombinedGridView> {
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  CombineHelper combineHelper = CombineHelper();
+  List<ImageModel> data;
+
+  Widget buildCtn() {
+    if (globalSearch == null) {
+      return Center(
+        child: Text('Please search item'),
+      );
+    }
+    if (data == null) {
+      combineHelper
+          .combineLists(search: globalSearch, page: combinedCounter)
+          .then((result) {
+        setState(() {
+          data = result;
+        });
+      });
+      return Center(
+        child: SizedBox(
+          height: 70.0,
+          width: 70.0,
+          child: Platform.isIOS
+              ? CupertinoActivityIndicator(
+                  radius: 20,
+                )
+              : RefreshProgressIndicator(
+                  backgroundColor: Colors.grey,
+                  strokeWidth: 5.0,
+                ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      padding: EdgeInsets.all(15.0),
+      physics: ClampingScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        childAspectRatio: 0.555,
+        mainAxisSpacing: 8.0,
+      ),
+      itemBuilder: (c, i) => Item(
+        title: data[i].title,
+        url: data[i].url,
+        image: data[i].img,
+        price: data[i].price,
+        website: data[i].website,
+        rating: 5,
+        reviews: 23,
+      ),
+      itemCount: data.length,
+    );
+  }
+
 //  @override
-//  _CombinedGridViewState createState() => _CombinedGridViewState();
-//}
-//
-//class _CombinedGridViewState extends State<CombinedGridView>
-//    with AutomaticKeepAliveClientMixin<CombinedGridView> {
-//  CombineHelper combineHelper = CombineHelper();
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return PagewiseGridView.count(
-//      pageSize: CombinedGridView.PAGE_SIZE,
-//      crossAxisCount: 3,
-//      mainAxisSpacing: 8.0,
-//      crossAxisSpacing: 8.0,
-//      childAspectRatio: 0.555,
-//      padding: EdgeInsets.all(15.0),
-//      retryBuilder: (context, callback) {
-//        return RaisedButton(child: Text('Retry'), onPressed: () => callback());
-//      },
-//      noItemsFoundBuilder: (context) {
-//        return Text('No Items Found');
-//      },
-//      loadingBuilder: (context) {
-//        return Center(
-//          child: SizedBox(
-//              height: 70.0,
-//              width: 70.0,
-//              child: RefreshProgressIndicator(
-//                backgroundColor: Colors.grey,
-//                strokeWidth: 5.0,
-//              )),
-//        );
-//      },
-//      itemBuilder: this._itemBuilder,
-//      pageFuture: (pageIndex) {
-//        log('Loading next page');
-//        return combineHelper.combineLists(
-//            page: pageIndex, search: widget.search);
-//      },
-//    );
+//  void initState() {
+//    super.initState();
+//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
+//      setState(() {
+//        data = result;
+//      });
+//    });
 //  }
-//
-//  Widget _itemBuilder(BuildContext context, ImageModel entry, int _) {
-//    Color getColor() {
-//      if (entry.title == 'Error') {
-//        return Color(0xFF323131);
-//      } else {
-//        return Colors.grey[600];
-//      }
-//    }
-//
-//    String getTitle() {
-//      if (entry.title == 'Error') {
-//        return 'Scroll Down For More';
-//      } else {
-//        return entry.title;
-//      }
-//    }
-//
-//    String getWebsite() {
-//      if (entry.title == 'Error') {
-//        return '';
-//      } else {
-//        return entry.website;
-//      }
-//    }
-//
-//    String getPrice() {
-//      if (entry.title == 'Error') {
-//        return '';
-//      } else {
-//        entry.price = '${entry.price}'.replaceAllMapped(
-//            new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-//            (Match m) => '${m[1]},');
-//        return 'RP ${entry.price}';
-//      }
-//    }
-//
-//    String getImage() {
-//      if (entry.title == 'Error') {
-//        return 'http://pixsector.com/cache/0688783e/avbf566659ab2bdf82f87.png';
-//      } else {
-//        return entry.img;
-//      }
-//    }
-//
-//    return Container(
-//      decoration: BoxDecoration(
-//        border: Border.all(color: Colors.grey[600]),
-//      ),
-//      child: GestureDetector(
-//        onTap: () {
-//          showDialog(
-//              context: context,
-//              builder: (BuildContext context) {
-//                return AlertDialog(
-//                  backgroundColor: Color(0xFF323131),
-//                  shape: RoundedRectangleBorder(
-//                      borderRadius: BorderRadius.circular(20.0)),
-//                  content: Container(
-//                    height: 400.0,
-//                    child: Column(
-//                      crossAxisAlignment: CrossAxisAlignment.stretch,
-//                      children: <Widget>[
-//                        Align(
-//                            alignment: Alignment.centerRight,
-//                            child: Icon(Icons.clear)),
-//                        SizedBox(height: 10.0),
-//                        Expanded(
-//                          flex: 1,
-//                          child: Container(
-//                            child: Text(getTitle()),
-//                          ),
-//                        ),
-//                        Expanded(
-//                          flex: 3,
-//                          child: Container(
-//                            decoration: BoxDecoration(
-//                              color: Colors.grey[200],
-//                              image: DecorationImage(
-//                                  image: NetworkImage(getImage()),
-//                                  fit: BoxFit.fill),
-//                            ),
-//                          ),
-//                        ),
-//                        Expanded(
-//                          flex: 1,
-//                          child: Container(
-//                            child: Text('Hello There'),
-//                          ),
-//                        )
-//                      ],
-//                    ),
-//                  ),
-//                );
-//              });
-//        },
-//        child: Column(
-//            mainAxisAlignment: MainAxisAlignment.start,
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            children: [
-//              Expanded(
-//                child: GestureDetector(
-//                  onTap: () async {
-//                    if (await canLaunch(entry.url)) {
-//                      await launch(entry.url);
-//                    }
-//                  },
-//                  child: Container(
-//                    decoration: BoxDecoration(
-//                      color: Colors.grey[200],
-//                      image: DecorationImage(
-//                          image: NetworkImage(getImage()), fit: BoxFit.fill),
-//                    ),
-//                  ),
-//                ),
-//              ),
-//              SizedBox(height: 8.0),
-//              Expanded(
-//                child: Padding(
-//                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                    child: SizedBox(
-//                        height: 30.0,
-//                        child: SingleChildScrollView(
-//                            child: Text(getTitle(),
-//                                style: TextStyle(fontSize: 12.0))))),
-//              ),
-//              SizedBox(height: 8.0),
-//              Padding(
-//                padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                child: Text(
-//                  getPrice(),
-//                  style: TextStyle(fontWeight: FontWeight.bold),
-//                ),
-//              ),
-//              SizedBox(height: 8.0),
-//              Padding(
-//                padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                child: Text(
-//                  getWebsite(),
-//                ),
-//              ),
-//              SizedBox(height: 4.0),
-//            ]),
-//      ),
-//    );
-//  }
-//
-//  @override
-//  bool get wantKeepAlive => true;
-//}
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartRefresher(
+      controller: _refreshController,
+      enablePullUp: true,
+      child: buildCtn(),
+      header: WaterDropHeader(),
+      onRefresh: () async {
+        //monitor fetch data from network
+        if (data != null) {
+          data.clear();
+          await Future.delayed(Duration(milliseconds: 1000));
+          log('${globalSearch}');
+          combinedCounter = 0;
+          data = await combineHelper.combineLists(
+              search: globalSearch, page: combinedCounter);
+        }
+
+        if (mounted) setState(() {});
+        _refreshController.refreshCompleted();
+
+        /*
+        if(failed){
+         _refreshController.refreshFailed();
+        }
+      */
+      },
+      onLoading: () async {
+        if (data != null) {
+          await Future.delayed(Duration(milliseconds: 1000));
+          combinedCounter++;
+          log('Loading Page $combinedCounter');
+          List<ImageModel> tempList = await combineHelper.combineLists(
+              search: globalSearch, page: combinedCounter);
+          log('Length of b4 added data: ${data.length}');
+
+          int temp = tempList.length;
+          log('Length of templist: $temp');
+          for (int x = 0; x < temp; x++) {
+            log('index $x');
+            log('data length ${data.length}');
+            data.add(tempList[x]);
+          }
+          log('Done adding');
+          data.sort((a, b) => a.price.compareTo(b.price));
+          log('Done merging');
+
+          log('Length before kill: ${data.length}');
+          ImageModel imageModel = ImageModel();
+
+          data = imageModel.removeDuplicates(data: data);
+          log('Length after kill: ${data.length}');
+        }
+        if (mounted) setState(() {});
+        _refreshController.loadComplete();
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}

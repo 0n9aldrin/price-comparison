@@ -1,20 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import '../Item.dart';
 import '../image_model.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:pricecomparison/main.dart';
 
 class Ebay {
   String search;
   int searchLength;
-  bool combined;
+  var future;
+  var html;
 
-  Future<List<ImageModel>> getEbay(
-      {String searches, int page, bool combine}) async {
+  Future<List<ImageModel>> getEbay({String searches, int page}) async {
     search = searches;
     search = search.replaceAll(' ', '+');
 
-    combined = combine;
-
-    var html = await getHtml(page: page);
+    html = await getHtml(page: page);
     html = parse(html);
     List<ImageModel> items = getData(html: html);
 //    for (int x = 0; x < items.length; x++) {
@@ -29,6 +33,14 @@ class Ebay {
 
     var html = await getHtml(page: 0);
     html = parse(html);
+    var a = html.querySelectorAll(
+        '#mainContent > div.s-answer-region.s-answer-region-center-top > div > div.clearfix.srp-controls__row-2 > div > div.srp-controls__control.srp-controls__count > h1 > span');
+    var total = a[0].text;
+    return total;
+  }
+
+  Future<dynamic> getTotal1({String searches, int page}) async {
+    future = await getEbay(searches: searches, page: page);
     var a = html.querySelectorAll(
         '#mainContent > div.s-answer-region.s-answer-region-center-top > div > div.clearfix.srp-controls__row-2 > div > div.srp-controls__control.srp-controls__count > h1 > span');
     var total = a[0].text;
@@ -109,136 +121,133 @@ class Ebay {
     return data;
   }
 }
-//
-//class EbayGridView extends StatefulWidget {
-//  final search;
-//  static const int PAGE_SIZE = 63;
-//
-//  EbayGridView({Key key, @required this.search}) : super(key: key);
-//
+
+class EbayGridView extends StatefulWidget {
+  EbayGridView({this.ebay});
+  Ebay ebay;
+  @override
+  State<StatefulWidget> createState() {
+    return _EbayGridViewState();
+  }
+}
+
+class _EbayGridViewState extends State<EbayGridView>
+    with AutomaticKeepAliveClientMixin<EbayGridView> {
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  Widget buildCtn() {
+    if (globalSearch == null) {
+      return Center(
+        child: Text('Please search item'),
+      );
+    }
+    if (ebayItems == null) {
+      widget.ebay
+          .getEbay(searches: globalSearch, page: ebayCounter)
+          .then((result) {
+        setState(() {
+          ebayItems = result;
+        });
+      });
+      return Center(
+        child: SizedBox(
+          height: 70.0,
+          width: 70.0,
+          child: Platform.isIOS
+              ? CupertinoActivityIndicator(
+                  radius: 20,
+                )
+              : RefreshProgressIndicator(
+                  backgroundColor: Colors.grey,
+                  strokeWidth: 5.0,
+                ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      padding: EdgeInsets.all(15.0),
+      physics: ClampingScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        childAspectRatio: 0.555,
+        mainAxisSpacing: 8.0,
+      ),
+      itemBuilder: (c, i) => Item(
+        title: ebayItems[i].title,
+        url: ebayItems[i].url,
+        image: ebayItems[i].img,
+        price: ebayItems[i].price,
+        reviews: 12,
+        rating: 4,
+      ),
+      itemCount: ebayItems.length,
+    );
+  }
+
 //  @override
-//  _EbayGridViewState createState() => _EbayGridViewState();
-//}
-//
-//class _EbayGridViewState extends State<EbayGridView>
-//    with AutomaticKeepAliveClientMixin<EbayGridView> {
-//  Ebay ebay = Ebay();
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return PagewiseGridView.count(
-//      pageSize: EbayGridView.PAGE_SIZE,
-//      crossAxisCount: 3,
-//      mainAxisSpacing: 8.0,
-//      crossAxisSpacing: 8.0,
-//      childAspectRatio: 0.555,
-//      padding: EdgeInsets.all(15.0),
-//      retryBuilder: (context, callback) {
-//        return RaisedButton(child: Text('Retry'), onPressed: () => callback());
-//      },
-//      noItemsFoundBuilder: (context) {
-//        return Text('No Items Found');
-//      },
-//      loadingBuilder: (context) {
-//        return Center(
-//          child: SizedBox(
-//              height: 70.0,
-//              width: 70.0,
-//              child: RefreshProgressIndicator(
-//                backgroundColor: Colors.grey,
-//                strokeWidth: 5.0,
-//              )),
-//        );
-//      },
-//      itemBuilder: this._itemBuilder,
-//      pageFuture: (pageIndex) {
-//        log('Loading next Ebay page');
-//        return ebay.getEbay(
-//            page: pageIndex, searches: widget.search, combine: false);
-//      },
-//    );
+//  void initState() {
+//    super.initState();
+//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
+//      setState(() {
+//        data = result;
+//      });
+//    });
 //  }
-//
-//  Widget _itemBuilder(BuildContext context, ImageModel entry, int _) {
-//    Color getColor() {
-//      if (entry.title == 'null') {
-//        return Color(0xFF323131);
-//      } else {
-//        return Colors.grey[600];
-//      }
-//    }
-//
-//    String getTitle() {
-//      if (entry.title == 'null') {
-//        return '';
-//      } else {
-//        return entry.title;
-//      }
-//    }
-//
-//    String getPrice() {
-//      if (entry.title == 'null') {
-//        return '';
-//      } else {
-//        return 'RP ${entry.price}';
-//      }
-//    }
-//
-//    Widget getImage() {
-//      if (entry.title == 'null') {
-//        return Container(
-//          decoration: BoxDecoration(),
-//        );
-//      } else {
-//        return Container(
-//          decoration: BoxDecoration(
-//            color: Colors.grey[200],
-//            image: DecorationImage(
-//                image: NetworkImage(entry.img), fit: BoxFit.fill),
-//          ),
-//        );
-//      }
-//    }
-//
-//    return Container(
-//        decoration: BoxDecoration(
-//          border: Border.all(color: getColor()),
-//        ),
-//        child: Column(
-//            mainAxisAlignment: MainAxisAlignment.start,
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            children: [
-//              Expanded(
-//                child: GestureDetector(
-//                    onTap: () async {
-//                      if (await canLaunch(entry.url)) {
-//                        await launch(entry.url);
-//                      }
-//                    },
-//                    child: getImage()),
-//              ),
-//              SizedBox(height: 8.0),
-//              Expanded(
-//                child: Padding(
-//                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                    child: SizedBox(
-//                        height: 30.0,
-//                        child: SingleChildScrollView(
-//                            child: Text(getTitle(),
-//                                style: TextStyle(fontSize: 12.0))))),
-//              ),
-//              SizedBox(height: 8.0),
-//              Padding(
-//                padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                child: Text(
-//                  getPrice(),
-//                  style: TextStyle(fontWeight: FontWeight.bold),
-//                ),
-//              ),
-//              SizedBox(height: 8.0)
-//            ]));
-//  }
-//
-//  @override
-//  bool get wantKeepAlive => true;
-//}
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartRefresher(
+      controller: _refreshController,
+      enablePullUp: true,
+      child: buildCtn(),
+      header: WaterDropHeader(),
+      onRefresh: () async {
+        //monitor fetch data from network
+        if (ebayItems != null) {
+          if (ebaySorted == false) {
+            ebayItems.clear();
+            await Future.delayed(Duration(milliseconds: 1000));
+            ebayCounter = 1;
+            ebayItems = await widget.ebay
+                .getEbay(searches: globalSearch, page: ebayCounter);
+          } else {
+            setState(() {});
+          }
+        }
+
+        if (mounted) setState(() {});
+        _refreshController.refreshCompleted();
+
+        /*
+        if(failed){
+         _refreshController.refreshFailed();
+        }
+      */
+      },
+      onLoading: () async {
+        //monitor fetch data from network
+        if (ebayItems != null) {
+          await Future.delayed(Duration(milliseconds: 1000));
+          ebayCounter++;
+          List<ImageModel> tempList = await widget.ebay
+              .getEbay(searches: globalSearch, page: ebayCounter);
+          for (int x = 0; x < tempList.length; x++) {
+            ebayItems.add(tempList[x]);
+          }
+          if (ebaySorted == true) {
+            sortDataByPrice(list: ebayItems);
+          }
+        }
+//    pageIndex++;
+        if (mounted) setState(() {});
+        _refreshController.loadComplete();
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}

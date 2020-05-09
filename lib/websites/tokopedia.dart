@@ -1,11 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:pricecomparison/main.dart';
+import '../Item.dart';
 import '../image_model.dart';
 import 'dart:developer';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'dart:io';
 
 class Tokopedia {
   String search;
@@ -244,221 +246,141 @@ class Tokopedia {
     return json;
   }
 }
-//
-//class TokopediaGridView extends StatefulWidget {
-//  final search;
-//  static int PAGE_SIZE = 60;
-//
-//  TokopediaGridView({Key key, @required this.search}) : super(key: key);
-//
-//  @override
-//  _TokopediaGridViewState createState() => _TokopediaGridViewState();
-//}
-//
-//class _TokopediaGridViewState extends State<TokopediaGridView>
-//    with AutomaticKeepAliveClientMixin<TokopediaGridView> {
-//  Tokopedia tokopedia = Tokopedia();
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return PagewiseGridView.count(
-//      pageSize: TokopediaGridView.PAGE_SIZE,
-//      crossAxisCount: 3,
-//      mainAxisSpacing: 8.0,
-//      crossAxisSpacing: 8.0,
-//      childAspectRatio: 0.555,
-//      padding: EdgeInsets.all(15.0),
-//      retryBuilder: (context, callback) {
-//        return RaisedButton(child: Text('Retry'), onPressed: () => callback());
-//      },
-//      noItemsFoundBuilder: (context) {
-//        return Text('No Items Found');
-//      },
-//      loadingBuilder: (context) {
-//        return Center(
-//          child: SizedBox(
-//              height: 70.0,
-//              width: 70.0,
-//              child: RefreshProgressIndicator(
-//                backgroundColor: Colors.grey,
-//                strokeWidth: 5.0,
-//              )),
-//        );
-//      },
-//      itemBuilder: this._itemBuilder,
-//      pageFuture: (pageIndex) {
-//        if (pageIndex == 0) {
-//          log('Loading first page');
-//          return tokopedia.getAds(searches: widget.search);
-//        } else {
-//          log('Loading next Tokopedia page');
-//          return tokopedia.getTokopedia(
-//              page: pageIndex, searches: widget.search);
-//        }
-//      },
-//    );
-//  }
-//
-//  Widget _itemBuilder(BuildContext context, ImageModel entry, int _) {
-//    return Container(
-//        decoration: BoxDecoration(
-//          border: Border.all(color: Colors.grey[600]),
-//        ),
-//        child: Column(
-//            mainAxisAlignment: MainAxisAlignment.start,
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            children: [
-//              Expanded(
-//                child: GestureDetector(
-//                  onTap: () async {
-//                    if (await canLaunch(entry.url)) {
-//                      await launch(entry.url);
-//                    }
-//                  },
-//                  child: Container(
-//                    decoration: BoxDecoration(
-//                        color: Colors.grey[200],
-//                        image: DecorationImage(
-//                            image: NetworkImage(entry.img), fit: BoxFit.fill)),
-//                  ),
-//                ),
-//              ),
-//              SizedBox(height: 8.0),
-//              Expanded(
-//                child: Padding(
-//                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                    child: SizedBox(
-//                        height: 30.0,
-//                        child: SingleChildScrollView(
-//                            child: Text(entry.title,
-//                                style: TextStyle(fontSize: 12.0))))),
-//              ),
-//              SizedBox(height: 8.0),
-//              Padding(
-//                padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                child: Text(
-//                  'RP ${entry.price}',
-//                  style: TextStyle(fontWeight: FontWeight.bold),
-//                ),
-//              ),
-//              SizedBox(height: 8.0)
-//            ]));
-//  }
-//
-//  @override
-//  bool get wantKeepAlive => true;
-//}
 
-//class TokopediaGridView extends StatefulWidget {
-//  final search;
-//  static const int PAGE_SIZE = 60;
-//
-//  TokopediaGridView({Key key, @required this.search}) : super(key: key);
-//
-//  @override
-//  _TokopediaGridViewState createState() => _TokopediaGridViewState();
-//}
-//
-//class _TokopediaGridViewState extends State<TokopediaGridView> {
-//  Tokopedia tokopedia = Tokopedia();
-//  List<ImageModel> items;
-//  List<ImageModel> filtered;
-//  List<ImageModel> currentList;
-//
+class TokopediaGridView extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _TokopediaGridViewState();
+  }
+}
+
+class _TokopediaGridViewState extends State<TokopediaGridView>
+    with AutomaticKeepAliveClientMixin<TokopediaGridView> {
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  Tokopedia tokopedia = Tokopedia();
+
+  Widget buildCtn() {
+    if (globalSearch == null) {
+      return Center(
+        child: Text('Please search item'),
+      );
+    }
+    if (tokopediaItems == null) {
+      tokopedia.getAds(searches: globalSearch).then((result) {
+        setState(() {
+          if (result.length == 0) {
+            tokopedia
+                .getTokopedia(searches: globalSearch, page: tokopediaCounter)
+                .then((result1) {
+              setState(() {
+                tokopediaItems = result1;
+              });
+            });
+          } else {
+            tokopediaItems = result;
+          }
+        });
+      });
+      return Center(
+        child: SizedBox(
+          height: 70.0,
+          width: 70.0,
+          child: Platform.isIOS
+              ? CupertinoActivityIndicator(
+                  radius: 20,
+                )
+              : RefreshProgressIndicator(
+                  backgroundColor: Colors.grey,
+                  strokeWidth: 5.0,
+                ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      padding: EdgeInsets.all(15.0),
+      physics: ClampingScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        childAspectRatio: 0.555,
+        mainAxisSpacing: 8.0,
+      ),
+      itemBuilder: (c, i) => Item(
+        title: tokopediaItems[i].title,
+        url: tokopediaItems[i].url,
+        image: tokopediaItems[i].img,
+        price: tokopediaItems[i].price,
+        reviews: 12,
+        rating: 4,
+      ),
+      itemCount: tokopediaItems.length,
+    );
+  }
+
 //  @override
 //  void initState() {
 //    super.initState();
-//    setState(() async {
-//      currentList =
-//      await tokopedia.getTokopedia(page: 0, searches: widget.search);
-//      filtered = currentList;
+//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
+//      setState(() {
+//        data = result;
+//      });
 //    });
 //  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return PagewiseGridView.count(
-//      pageSize: TokopediaGridView.PAGE_SIZE,
-//      crossAxisCount: 3,
-//      mainAxisSpacing: 8.0,
-//      crossAxisSpacing: 8.0,
-//      childAspectRatio: 0.555,
-//      padding: EdgeInsets.all(15.0),
-//      retryBuilder: (context, callback) {
-//        return RaisedButton(child: Text('Retry'), onPressed: () => callback());
-//      },
-//      noItemsFoundBuilder: (context) {
-//        return Text('No Items Found');
-//      },
-//      loadingBuilder: (context) {
-//        return Center(
-//          child: SizedBox(
-//              height: 70.0,
-//              width: 70.0,
-//              child: RefreshProgressIndicator(
-//                backgroundColor: Colors.grey,
-//                strokeWidth: 5.0,
-//              )),
-//        );
-//      },
-//      itemBuilder: this._itemBuilder,
-//      pageFuture: (pageIndex) async {
-//        print('Loading next page');
-//        if (pageIndex == 0) {
-//          items = currentList;
-//        } else {
-//          List<ImageModel> currentList =
-//          await tokopedia.getTokopedia(page: 0, searches: widget.search);
-//          items.addAll(currentList);
-//        }
-//        return currentList;
-//      },
-//    );
-//  }
-//
-//  Widget _itemBuilder(BuildContext context, ImageModel entry, int _) {
-//    return Container(
-//        decoration: BoxDecoration(
-//          border: Border.all(color: Colors.grey[600]),
-//        ),
-//        child: Column(
-//            mainAxisAlignment: MainAxisAlignment.start,
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            children: [
-//              Expanded(
-//                child: GestureDetector(
-//                  onTap: () async {
-//                    if (await canLaunch(entry.url)) {
-//                      await launch(entry.url);
-//                    }
-//                  },
-//                  child: Container(
-//                    decoration: BoxDecoration(
-//                        color: Colors.grey[200],
-//                        image: DecorationImage(
-//                            image: NetworkImage(entry.img), fit: BoxFit.fill)),
-//                  ),
-//                ),
-//              ),
-//              SizedBox(height: 8.0),
-//              Expanded(
-//                child: Padding(
-//                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                    child: SizedBox(
-//                        height: 30.0,
-//                        child: SingleChildScrollView(
-//                            child: Text(entry.title,
-//                                style: TextStyle(fontSize: 12.0))))),
-//              ),
-//              SizedBox(height: 8.0),
-//              Padding(
-//                padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                child: Text(
-//                  'RP ${entry.price}',
-//                  style: TextStyle(fontWeight: FontWeight.bold),
-//                ),
-//              ),
-//              SizedBox(height: 8.0)
-//            ]));
-//  }
-//}
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartRefresher(
+      controller: _refreshController,
+      enablePullUp: true,
+      child: buildCtn(),
+      header: WaterDropHeader(),
+      onRefresh: () async {
+        //monitor fetch data from network
+        if (tokopediaItems != null) {
+          if (tokopediaSorted == false) {
+            tokopediaItems.clear();
+            await Future.delayed(Duration(milliseconds: 1000));
+            log('$globalSearch');
+            tokopediaCounter = 0;
+            tokopediaItems = await tokopedia.getAds(searches: globalSearch);
+          } else {
+            setState(() {});
+          }
+        }
+
+        if (mounted) setState(() {});
+        _refreshController.refreshCompleted();
+
+        /*
+        if(failed){
+         _refreshController.refreshFailed();
+        }
+      */
+      },
+      onLoading: () async {
+        //monitor fetch data from network
+        if (tokopediaItems != null) {
+          await Future.delayed(Duration(milliseconds: 1000));
+          tokopediaCounter++;
+          List<ImageModel> tempList = await tokopedia.getTokopedia(
+              searches: globalSearch, page: (tokopediaCounter - 1));
+          for (int x = 0; x < tempList.length; x++) {
+            tokopediaItems.add(tempList[x]);
+          }
+          if (tokopediaSorted == true) {
+            sortDataByPrice(list: tokopediaItems);
+          }
+        }
+
+//    pageIndex++;
+        if (mounted) setState(() {});
+        _refreshController.loadComplete();
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}

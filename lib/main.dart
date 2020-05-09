@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pricecomparison/fancy_fab.dart';
 import 'package:pricecomparison/image_model.dart';
+import 'package:pricecomparison/websites/lazada.dart';
+import 'package:pricecomparison/websites/shopee.dart';
 import 'websites/blibli.dart';
-import 'websites/tokopedia.dart' as tok;
+import 'websites/tokopedia.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'Item.dart';
 import 'dart:developer';
@@ -31,6 +33,8 @@ int blibliCounter = 0;
 int ebayCounter = 1;
 int tokopediaCounter = 0;
 int bukalapakCounter = 1;
+int lazadaCounter = 1;
+int shopeeCounter = 0;
 int combinedCounter = 0;
 List<ImageModel> blibliItems;
 bool blibliSorted = false;
@@ -40,6 +44,10 @@ List<ImageModel> bukalapakItems;
 bool bukalapakSorted = false;
 List<ImageModel> ebayItems;
 bool ebaySorted = false;
+List<ImageModel> lazadaItems;
+bool lazadaSorted = false;
+List<ImageModel> shopeeItems;
+bool shopeeSorted = false;
 List<ImageModel> combinedItems;
 bool combinedSorted = false;
 
@@ -50,11 +58,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  tok.Tokopedia tokopedia = tok.Tokopedia();
+  Tokopedia tokopedia = Tokopedia();
   Ebay ebay = Ebay();
   Bukalapak bukalapak = Bukalapak();
   Blibli blibli = Blibli();
   CombineHelper combineHelper = CombineHelper();
+  Lazada lazada = Lazada();
+  Shopee shopee = Shopee();
   File _file;
 
   Widget _appBarTitle = Text('Combined Search');
@@ -84,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage>
     1: Text("Blibli"),
     2: Text("Ebay"),
     3: Text("Bukalapak"),
-    4: Text("Combined"),
+    4: Text("Shopee"),
+    5: Text("Combined"),
   };
 
   dynamic whichGrid() {
@@ -113,6 +124,22 @@ class _MyHomePageState extends State<MyHomePage>
     } else if (segmentedControlGroupValue == 4) {
       return combineHelper.combineTotal(search: globalSearch);
     }
+  }
+
+  Widget totalWidget({Future<dynamic> future}) {
+    return FutureBuilder(
+        builder: (context, snapshot) {
+          return Container(
+            color: Colors.grey,
+            height: 28.0,
+            padding: EdgeInsets.only(left: 20.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Total results: ${snapshot.data}'),
+            ),
+          );
+        },
+        future: future);
   }
 
   Widget mainWidget() {
@@ -206,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage>
       );
     } else {
       return DefaultTabController(
-        length: 5,
+        length: 6,
         child: SafeArea(
           child: Scaffold(
             appBar: AppBar(
@@ -274,6 +301,9 @@ class _MyHomePageState extends State<MyHomePage>
                     text: 'Bukalapak',
                   ),
                   Tab(
+                    text: 'Shopee',
+                  ),
+                  Tab(
                     text: 'Combined',
                   ),
                 ],
@@ -327,22 +357,14 @@ class _MyHomePageState extends State<MyHomePage>
                     Column(
                       children: <Widget>[
                         Expanded(
-                          child: EbayGridView(),
+                          child: EbayGridView(
+                            ebay: ebay,
+                          ),
                         ),
-                        FutureBuilder(
-                          builder: (context, snapshot) {
-                            return Container(
-                              color: Colors.grey,
-                              height: 28.0,
-                              padding: EdgeInsets.only(left: 20.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text('Total results: ${snapshot.data}'),
-                              ),
-                            );
-                          },
-                          future: ebay.getTotal(searches: globalSearch),
-                        ),
+                        totalWidget(
+                          future: ebay.getTotal1(
+                              searches: globalSearch, page: ebayCounter),
+                        )
                       ],
                     ),
                     Positioned(
@@ -364,7 +386,9 @@ class _MyHomePageState extends State<MyHomePage>
                     Column(
                       children: <Widget>[
                         Expanded(
-                          child: BlibliGridView(),
+                          child: BlibliGridView(
+                            blibli: blibli,
+                          ),
                         ),
                         FutureBuilder(
                           builder: (context, snapshot) {
@@ -378,9 +402,8 @@ class _MyHomePageState extends State<MyHomePage>
                                       Text('Total results: ${snapshot.data}')),
                             );
                           },
-                          future: blibli.getTotal(
-                            searches: globalSearch,
-                          ),
+                          future: blibli.getTotal1(
+                              searches: globalSearch, page: blibliCounter),
                         )
                       ],
                     ),
@@ -403,7 +426,9 @@ class _MyHomePageState extends State<MyHomePage>
                     Column(
                       children: <Widget>[
                         Expanded(
-                          child: BukalapakGridView(),
+                          child: BukalapakGridView(
+                            bukalapak: bukalapak,
+                          ),
                         ),
                         FutureBuilder(
                           builder: (context, snapshot) {
@@ -417,7 +442,8 @@ class _MyHomePageState extends State<MyHomePage>
                                       Text('Total results: ${snapshot.data}')),
                             );
                           },
-                          future: bukalapak.getTotal(searches: globalSearch),
+                          future: bukalapak.getTotal1(
+                              searches: globalSearch, page: bukalapakCounter),
                         )
                       ],
                     ),
@@ -428,6 +454,46 @@ class _MyHomePageState extends State<MyHomePage>
                         onPressedPrice: () {
                           sortDataByPrice(list: bukalapakItems);
                           bukalapakSorted = true;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                )),
+                Scrollbar(
+                    child: Stack(
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: ShopeeGridView(
+                            shopee: shopee,
+                          ),
+                        ),
+                        FutureBuilder(
+                          builder: (context, snapshot) {
+                            return Container(
+                              color: Colors.grey,
+                              height: 28.0,
+                              padding: EdgeInsets.only(left: 20.0),
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child:
+                                      Text('Total results: ${snapshot.data}')),
+                            );
+                          },
+                          future: shopee.getTotal1(
+                              searches: globalSearch, page: shopeeCounter),
+                        )
+                      ],
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      right: 15,
+                      child: FancyFab(
+                        onPressedPrice: () {
+                          sortDataByPrice(list: shopeeItems);
+                          shopeeSorted = true;
                           setState(() {});
                         },
                       ),
@@ -500,666 +566,4 @@ void sortDataByPrice({List<ImageModel> list}) {
   CombineHelper().mergeSort(list, 0, list.length - 1);
   log('Sorted');
   convertPriceToString(list: list);
-}
-
-class BlibliGridView extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return BlibliGridViewState();
-  }
-}
-
-class BlibliGridViewState extends State<BlibliGridView>
-    with AutomaticKeepAliveClientMixin<BlibliGridView> {
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  Blibli blibli = Blibli();
-
-  Widget buildCtn() {
-    if (globalSearch == null) {
-      return Center(
-        child: Text('Please search item'),
-      );
-    }
-    if (blibliItems == null) {
-      blibli
-          .getBlibli(page: blibliCounter, searches: globalSearch)
-          .then((result) {
-        setState(() {
-          blibliItems = result;
-        });
-      });
-      return Center(
-        child: SizedBox(
-          height: 70.0,
-          width: 70.0,
-          child: Platform.isIOS
-              ? CupertinoActivityIndicator(
-                  radius: 20,
-                )
-              : RefreshProgressIndicator(
-                  backgroundColor: Colors.grey,
-                  strokeWidth: 5.0,
-                ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      padding: EdgeInsets.all(15.0),
-      physics: ClampingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: 0.555,
-        mainAxisSpacing: 8.0,
-      ),
-      itemBuilder: (c, i) => Item(
-        title: blibliItems[i].title,
-        url: blibliItems[i].url,
-        image: blibliItems[i].img,
-        price: blibliItems[i].price,
-        reviews: 12,
-        rating: 4,
-      ),
-      itemCount: blibliItems.length,
-    );
-  }
-
-//  @override
-//  void initState() {
-//    super.initState();
-//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
-//      setState(() {
-//        data = result;
-//      });
-//    });
-//  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullUp: true,
-      child: buildCtn(),
-      header: WaterDropHeader(),
-      onRefresh: () async {
-        //monitor fetch data from network
-        if (blibliItems != null) {
-          if (blibliSorted == false) {
-            blibliItems.clear();
-            await Future.delayed(Duration(milliseconds: 1000));
-            log('$globalSearch');
-            blibliCounter = 0;
-            blibliItems = await blibli.getBlibli(
-                page: blibliCounter, searches: globalSearch);
-          } else {
-            setState(() {});
-          }
-        }
-
-        if (mounted) setState(() {});
-        _refreshController.refreshCompleted();
-
-        /*
-        if(failed){
-         _refreshController.refreshFailed();
-        }
-      */
-      },
-      onLoading: () async {
-        //monitor fetch data from network
-        if (blibliItems != null) {
-          await Future.delayed(Duration(milliseconds: 1000));
-          blibliCounter++;
-          List<ImageModel> tempList = await blibli.getBlibli(
-              page: blibliCounter, searches: globalSearch);
-          for (int x = 0; x < tempList.length; x++) {
-            blibliItems.add(tempList[x]);
-          }
-          if (blibliSorted == true) {
-            sortDataByPrice(list: blibliItems);
-          }
-        }
-        if (mounted) setState(() {});
-        _refreshController.loadComplete();
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class TokopediaGridView extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _TokopediaGridViewState();
-  }
-}
-
-class _TokopediaGridViewState extends State<TokopediaGridView>
-    with AutomaticKeepAliveClientMixin<TokopediaGridView> {
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  tok.Tokopedia tokopedia = tok.Tokopedia();
-
-  Widget buildCtn() {
-    if (globalSearch == null) {
-      return Center(
-        child: Text('Please search item'),
-      );
-    }
-    if (tokopediaItems == null) {
-      tokopedia.getAds(searches: globalSearch).then((result) {
-        setState(() {
-          if (result.length == 0) {
-            tokopedia
-                .getTokopedia(searches: globalSearch, page: tokopediaCounter)
-                .then((result1) {
-              setState(() {
-                tokopediaItems = result1;
-              });
-            });
-          } else {
-            tokopediaItems = result;
-          }
-        });
-      });
-      return Center(
-        child: SizedBox(
-          height: 70.0,
-          width: 70.0,
-          child: Platform.isIOS
-              ? CupertinoActivityIndicator(
-                  radius: 20,
-                )
-              : RefreshProgressIndicator(
-                  backgroundColor: Colors.grey,
-                  strokeWidth: 5.0,
-                ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      padding: EdgeInsets.all(15.0),
-      physics: ClampingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: 0.555,
-        mainAxisSpacing: 8.0,
-      ),
-      itemBuilder: (c, i) => Item(
-        title: tokopediaItems[i].title,
-        url: tokopediaItems[i].url,
-        image: tokopediaItems[i].img,
-        price: tokopediaItems[i].price,
-        reviews: 12,
-        rating: 4,
-      ),
-      itemCount: tokopediaItems.length,
-    );
-  }
-
-//  @override
-//  void initState() {
-//    super.initState();
-//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
-//      setState(() {
-//        data = result;
-//      });
-//    });
-//  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullUp: true,
-      child: buildCtn(),
-      header: WaterDropHeader(),
-      onRefresh: () async {
-        //monitor fetch data from network
-        if (tokopediaItems != null) {
-          if (tokopediaSorted == false) {
-            tokopediaItems.clear();
-            await Future.delayed(Duration(milliseconds: 1000));
-            log('$globalSearch');
-            tokopediaCounter = 0;
-            tokopediaItems = await tokopedia.getAds(searches: globalSearch);
-          } else {
-            setState(() {});
-          }
-        }
-
-        if (mounted) setState(() {});
-        _refreshController.refreshCompleted();
-
-        /*
-        if(failed){
-         _refreshController.refreshFailed();
-        }
-      */
-      },
-      onLoading: () async {
-        //monitor fetch data from network
-        if (tokopediaItems != null) {
-          await Future.delayed(Duration(milliseconds: 1000));
-          tokopediaCounter++;
-          List<ImageModel> tempList = await tokopedia.getTokopedia(
-              searches: globalSearch, page: (tokopediaCounter - 1));
-          for (int x = 0; x < tempList.length; x++) {
-            tokopediaItems.add(tempList[x]);
-          }
-          if (tokopediaSorted == true) {
-            sortDataByPrice(list: tokopediaItems);
-          }
-        }
-
-//    pageIndex++;
-        if (mounted) setState(() {});
-        _refreshController.loadComplete();
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class BukalapakGridView extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _BukalapakGridViewState();
-  }
-}
-
-class _BukalapakGridViewState extends State<BukalapakGridView>
-    with AutomaticKeepAliveClientMixin<BukalapakGridView> {
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  Bukalapak bukalapak = Bukalapak();
-
-  Widget buildCtn() {
-    if (globalSearch == null) {
-      return Center(
-        child: Text('Please search item'),
-      );
-    }
-    if (bukalapakItems == null) {
-      bukalapak
-          .getBukalapak(searches: globalSearch, page: bukalapakCounter)
-          .then((result) {
-        setState(() {
-          bukalapakItems = result;
-        });
-      });
-      return Center(
-        child: SizedBox(
-          height: 70.0,
-          width: 70.0,
-          child: Platform.isIOS
-              ? CupertinoActivityIndicator(
-                  radius: 20,
-                )
-              : RefreshProgressIndicator(
-                  backgroundColor: Colors.grey,
-                  strokeWidth: 5.0,
-                ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      padding: EdgeInsets.all(15.0),
-      physics: ClampingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: 0.555,
-        mainAxisSpacing: 8.0,
-      ),
-      itemBuilder: (c, i) => Item(
-        title: bukalapakItems[i].title,
-        url: bukalapakItems[i].url,
-        image: bukalapakItems[i].img,
-        price: bukalapakItems[i].price,
-        reviews: 12,
-        rating: 4,
-      ),
-      itemCount: bukalapakItems.length,
-    );
-  }
-
-//  @override
-//  void initState() {
-//    super.initState();
-//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
-//      setState(() {
-//        data = result;
-//      });
-//    });
-//  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullUp: true,
-      child: buildCtn(),
-      header: WaterDropHeader(),
-      onRefresh: () async {
-        //monitor fetch data from network
-        if (bukalapakItems != null) {
-          if (bukalapakSorted == false) {
-            bukalapakItems.clear();
-            await Future.delayed(Duration(milliseconds: 1000));
-            log('$globalSearch');
-            bukalapakCounter = 1;
-            bukalapakItems = await bukalapak.getBukalapak(
-                searches: globalSearch, page: bukalapakCounter);
-          } else {
-            setState(() {});
-          }
-        }
-
-        if (mounted) setState(() {});
-        _refreshController.refreshCompleted();
-
-        /*
-        if(failed){
-         _refreshController.refreshFailed();
-        }
-      */
-      },
-      onLoading: () async {
-        if (bukalapakItems != null) {
-          await Future.delayed(Duration(milliseconds: 1000));
-          bukalapakCounter++;
-          log('Loading Page $bukalapakCounter');
-          List<ImageModel> tempList = await bukalapak.getBukalapak(
-              searches: globalSearch, page: bukalapakCounter);
-          for (int x = 0; x < tempList.length; x++) {
-            bukalapakItems.add(tempList[x]);
-          }
-          if (bukalapakSorted == true) {
-            sortDataByPrice(list: bukalapakItems);
-          }
-        }
-        if (mounted) setState(() {});
-        _refreshController.loadComplete();
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class EbayGridView extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _EbayGridViewState();
-  }
-}
-
-class _EbayGridViewState extends State<EbayGridView>
-    with AutomaticKeepAliveClientMixin<EbayGridView> {
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  Ebay ebay = Ebay();
-
-  Widget buildCtn() {
-    if (globalSearch == null) {
-      return Center(
-        child: Text('Please search item'),
-      );
-    }
-    if (ebayItems == null) {
-      ebay.getEbay(searches: globalSearch, page: ebayCounter).then((result) {
-        setState(() {
-          ebayItems = result;
-        });
-      });
-      return Center(
-        child: SizedBox(
-          height: 70.0,
-          width: 70.0,
-          child: Platform.isIOS
-              ? CupertinoActivityIndicator(
-                  radius: 20,
-                )
-              : RefreshProgressIndicator(
-                  backgroundColor: Colors.grey,
-                  strokeWidth: 5.0,
-                ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      padding: EdgeInsets.all(15.0),
-      physics: ClampingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: 0.555,
-        mainAxisSpacing: 8.0,
-      ),
-      itemBuilder: (c, i) => Item(
-        title: ebayItems[i].title,
-        url: ebayItems[i].url,
-        image: ebayItems[i].img,
-        price: ebayItems[i].price,
-        reviews: 12,
-        rating: 4,
-      ),
-      itemCount: ebayItems.length,
-    );
-  }
-
-//  @override
-//  void initState() {
-//    super.initState();
-//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
-//      setState(() {
-//        data = result;
-//      });
-//    });
-//  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullUp: true,
-      child: buildCtn(),
-      header: WaterDropHeader(),
-      onRefresh: () async {
-        //monitor fetch data from network
-        if (ebayItems != null) {
-          if (ebaySorted == false) {
-            ebayItems.clear();
-            await Future.delayed(Duration(milliseconds: 1000));
-            ebayCounter = 1;
-            ebayItems =
-                await ebay.getEbay(searches: globalSearch, page: ebayCounter);
-          } else {
-            setState(() {});
-          }
-        }
-
-        if (mounted) setState(() {});
-        _refreshController.refreshCompleted();
-
-        /*
-        if(failed){
-         _refreshController.refreshFailed();
-        }
-      */
-      },
-      onLoading: () async {
-        //monitor fetch data from network
-        if (ebayItems != null) {
-          await Future.delayed(Duration(milliseconds: 1000));
-          ebayCounter++;
-          List<ImageModel> tempList =
-              await ebay.getEbay(searches: globalSearch, page: ebayCounter);
-          for (int x = 0; x < tempList.length; x++) {
-            ebayItems.add(tempList[x]);
-          }
-          if (ebaySorted == true) {
-            sortDataByPrice(list: ebayItems);
-          }
-        }
-//    pageIndex++;
-        if (mounted) setState(() {});
-        _refreshController.loadComplete();
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class CombinedGridView extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _CombinedGridViewState();
-  }
-}
-
-class _CombinedGridViewState extends State<CombinedGridView>
-    with AutomaticKeepAliveClientMixin<CombinedGridView> {
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  CombineHelper combineHelper = CombineHelper();
-  List<ImageModel> data;
-
-  Widget buildCtn() {
-    if (globalSearch == null) {
-      return Center(
-        child: Text('Please search item'),
-      );
-    }
-    if (data == null) {
-      combineHelper
-          .combineLists(search: globalSearch, page: combinedCounter)
-          .then((result) {
-        setState(() {
-          data = result;
-        });
-      });
-      return Center(
-        child: SizedBox(
-          height: 70.0,
-          width: 70.0,
-          child: Platform.isIOS
-              ? CupertinoActivityIndicator(
-                  radius: 20,
-                )
-              : RefreshProgressIndicator(
-                  backgroundColor: Colors.grey,
-                  strokeWidth: 5.0,
-                ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      padding: EdgeInsets.all(15.0),
-      physics: ClampingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: 0.555,
-        mainAxisSpacing: 8.0,
-      ),
-      itemBuilder: (c, i) => Item(
-        title: data[i].title,
-        url: data[i].url,
-        image: data[i].img,
-        price: data[i].price,
-        website: data[i].website,
-        rating: 5,
-        reviews: 23,
-      ),
-      itemCount: data.length,
-    );
-  }
-
-//  @override
-//  void initState() {
-//    super.initState();
-//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
-//      setState(() {
-//        data = result;
-//      });
-//    });
-//  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullUp: true,
-      child: buildCtn(),
-      header: WaterDropHeader(),
-      onRefresh: () async {
-        //monitor fetch data from network
-        if (data != null) {
-          data.clear();
-          await Future.delayed(Duration(milliseconds: 1000));
-          log('${globalSearch}');
-          combinedCounter = 0;
-          data = await combineHelper.combineLists(
-              search: globalSearch, page: combinedCounter);
-        }
-
-        if (mounted) setState(() {});
-        _refreshController.refreshCompleted();
-
-        /*
-        if(failed){
-         _refreshController.refreshFailed();
-        }
-      */
-      },
-      onLoading: () async {
-        if (data != null) {
-          await Future.delayed(Duration(milliseconds: 1000));
-          combinedCounter++;
-          log('Loading Page $combinedCounter');
-          List<ImageModel> tempList = await combineHelper.combineLists(
-              search: globalSearch, page: combinedCounter);
-          log('Length of b4 added data: ${data.length}');
-
-          int temp = tempList.length;
-          log('Length of templist: $temp');
-          for (int x = 0; x < temp; x++) {
-            log('index $x');
-            log('data length ${data.length}');
-            data.add(tempList[x]);
-          }
-          log('Done adding');
-          data.sort((a, b) => a.price.compareTo(b.price));
-          log('Done merging');
-
-          log('Length before kill: ${data.length}');
-          ImageModel imageModel = ImageModel();
-
-          data = imageModel.removeDuplicates(data: data);
-          log('Length after kill: ${data.length}');
-        }
-        if (mounted) setState(() {});
-        _refreshController.loadComplete();
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
 }
