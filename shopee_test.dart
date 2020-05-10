@@ -38,7 +38,7 @@ void main() async {
       String shopId = json['items'][x]['shopid'].toString();
       String itemId = json['items'][x]['itemid'].toString();
       String url = 'https://shopee.co.id/' +
-          json['items'][0]['name'].replaceAll(' ', '-') +
+          json['items'][x]['name'].replaceAll(' ', '-') +
           '-i.' +
           shopId +
           '.' +
