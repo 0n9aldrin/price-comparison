@@ -5,8 +5,6 @@ import 'package:pricecomparison/websites/lazada.dart';
 import 'package:pricecomparison/websites/shopee.dart';
 import 'websites/blibli.dart';
 import 'websites/tokopedia.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'Item.dart';
 import 'dart:developer';
 import 'websites/ebay.dart';
 import 'websites/bukalapak.dart';
@@ -108,6 +106,8 @@ class _MyHomePageState extends State<MyHomePage>
     } else if (segmentedControlGroupValue == 3) {
       return BukalapakGridView();
     } else if (segmentedControlGroupValue == 4) {
+      return ShopeeGridView();
+    } else if (segmentedControlGroupValue == 4) {
       return CombinedGridView();
     }
   }
@@ -122,6 +122,8 @@ class _MyHomePageState extends State<MyHomePage>
     } else if (segmentedControlGroupValue == 3) {
       return bukalapak.getTotal(searches: globalSearch);
     } else if (segmentedControlGroupValue == 4) {
+      return shopee.getTotal(searches: globalSearch);
+    } else if (segmentedControlGroupValue == 5) {
       return combineHelper.combineTotal(search: globalSearch);
     }
   }
