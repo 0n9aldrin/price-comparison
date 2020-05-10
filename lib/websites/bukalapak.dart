@@ -16,40 +16,46 @@ class Bukalapak {
   var html;
 
   Future<dynamic> getTotal({String searches}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    var html = await getHtml(page: 0);
-    html = parse(html);
-    var a = html.querySelectorAll(
-        '#display_product_search > div.product-pagination-wrapper > div.pagination > span.last-page');
-    dynamic total = int.parse(a[0].text) * 50;
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+      var html = await getHtml(page: 0);
+      html = parse(html);
+      var a = html.querySelectorAll(
+          '#display_product_search > div.product-pagination-wrapper > div.pagination > span.last-page');
+      dynamic total = int.parse(a[0].text) * 50;
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<dynamic> getTotal1({String searches, int page}) async {
-    future = await getBukalapak(searches: searches, page: page);
-    var a = html.querySelectorAll(
-        '#display_product_search > div.product-pagination-wrapper > div.pagination > span.last-page');
-    dynamic total = int.parse(a[0].text) * 50;
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+    try {
+      future = await getBukalapak(searches: searches, page: page);
+      var a = html.querySelectorAll(
+          '#display_product_search > div.product-pagination-wrapper > div.pagination > span.last-page');
+      dynamic total = int.parse(a[0].text) * 50;
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<List<ImageModel>> getBukalapak({String searches, int page}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    html = await getHtml(page: page);
-    html = parse(html);
-    List<ImageModel> items = getData(html: html);
+      html = await getHtml(page: page);
+      html = parse(html);
+      List<ImageModel> items = getData(html: html);
 //    for (int x = 0; x < items.length; x++) {
 //      print(items[x].img);
 //    }
-    return items;
+      return items;
+    } on NoSuchMethodError {}
   }
 
   List<ImageModel> getData({var html}) {
@@ -88,7 +94,6 @@ class Bukalapak {
   }
 
   Future<dynamic> getHtml({int page}) async {
-    log("bukalpak html called");
     http.Response response = await http.get(
         'https://www.bukalapak.com/products/s?from=omnisearch&from_keyword_history=false&page=$page&search%5Bkeywords%5D=$search&search_source=omnisearch_organic&source=navbar&utf8=✓');
 
@@ -189,7 +194,6 @@ class _BukalapakGridViewState extends State<BukalapakGridView>
           if (bukalapakSorted == false) {
             bukalapakItems.clear();
             await Future.delayed(Duration(milliseconds: 1000));
-            log('$globalSearch');
             bukalapakCounter = 1;
             bukalapakItems = await widget.bukalapak
                 .getBukalapak(searches: globalSearch, page: bukalapakCounter);

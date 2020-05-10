@@ -16,31 +16,37 @@ class Shopee {
   var json;
 
   Future<dynamic> getTotal({String searches}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    var json = await getJson(page: 0);
-    var total = json['total_count'];
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+      var json = await getJson(page: 0);
+      var total = json['total_count'];
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<dynamic> getTotal1({String searches, int page}) async {
-    future = await getShopee(searches: searches, page: page);
-    var total = json['total_count'];
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+    try {
+      future = await getShopee(searches: searches, page: page);
+      var total = json['total_count'];
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<List<ImageModel>> getShopee({String searches, int page}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
-    json = await getJson(page: page);
-    List<ImageModel> items = getData(json: json);
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
+      json = await getJson(page: page);
+      List<ImageModel> items = getData(json: json);
 
-    return items;
+      return items;
+    } on NoSuchMethodError {}
   }
 
   List<ImageModel> getData({var json}) {
@@ -64,7 +70,6 @@ class Shopee {
       imageModel.url = url;
       imageModel.img =
           'https://cf.shopee.co.id/file/' + json['items'][x]['image'];
-      log("${json['items'][x]['image']}");
       imageModel.website = 'Shopee';
       imageModel.rating =
           json['items'][x]['item_rating']['rating_star'].round();
@@ -81,7 +86,6 @@ class Shopee {
   }
 
   Future<dynamic> getJson({int page}) async {
-    log("Shopee html");
     int start = page * 50;
     var headers = {
       'if-none-match-': '55b03-e17607803099ed81f4097a6d08057af3',
@@ -189,7 +193,6 @@ class ShopeeGridViewState extends State<ShopeeGridView>
           if (shopeeSorted == false) {
             shopeeItems.clear();
             await Future.delayed(Duration(milliseconds: 1000));
-            log('$globalSearch');
             shopeeCounter = 0;
             shopeeItems = await widget.shopee
                 .getShopee(page: shopeeCounter, searches: globalSearch);

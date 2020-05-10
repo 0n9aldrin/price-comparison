@@ -15,36 +15,39 @@ class Ebay {
   var html;
 
   Future<List<ImageModel>> getEbay({String searches, int page}) async {
-    search = searches;
-    search = search.replaceAll(' ', '+');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '+');
 
-    html = await getHtml(page: page);
-    html = parse(html);
-    List<ImageModel> items = getData(html: html);
-//    for (int x = 0; x < items.length; x++) {
-//      print(items[x].img);
-//    }
-    return items;
+      html = await getHtml(page: page);
+      html = parse(html);
+      List<ImageModel> items = getData(html: html);
+      return items;
+    } on NoSuchMethodError {}
   }
 
   Future<dynamic> getTotal({String searches}) async {
-    search = searches;
-    search = search.replaceAll(' ', '+');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '+');
 
-    var html = await getHtml(page: 0);
-    html = parse(html);
-    var a = html.querySelectorAll(
-        '#mainContent > div.s-answer-region.s-answer-region-center-top > div > div.clearfix.srp-controls__row-2 > div > div.srp-controls__control.srp-controls__count > h1 > span');
-    var total = a[0].text;
-    return total;
+      var html = await getHtml(page: 0);
+      html = parse(html);
+      var a = html.querySelectorAll(
+          '#mainContent > div.s-answer-region.s-answer-region-center-top > div > div.clearfix.srp-controls__row-2 > div > div.srp-controls__control.srp-controls__count > h1 > span');
+      var total = a[0].text;
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<dynamic> getTotal1({String searches, int page}) async {
-    future = await getEbay(searches: searches, page: page);
-    var a = html.querySelectorAll(
-        '#mainContent > div.s-answer-region.s-answer-region-center-top > div > div.clearfix.srp-controls__row-2 > div > div.srp-controls__control.srp-controls__count > h1 > span');
-    var total = a[0].text;
-    return total;
+    try {
+      future = await getEbay(searches: searches, page: page);
+      var a = html.querySelectorAll(
+          '#mainContent > div.s-answer-region.s-answer-region-center-top > div > div.clearfix.srp-controls__row-2 > div > div.srp-controls__control.srp-controls__count > h1 > span');
+      var total = a[0].text;
+      return total;
+    } on NoSuchMethodError {}
   }
 
   List<ImageModel> getData({var html}) {

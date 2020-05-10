@@ -123,25 +123,27 @@ class CombineHelper {
   }
 
   Future<int> combineTotal({var search}) async {
-    dynamic tokopediaTotal = await tokopedia.getTotal(searches: search);
-    dynamic ebayTotal = await ebay.getTotal(searches: search);
-    dynamic bukalapakTotal = await bukalapak.getTotal(searches: search);
-    dynamic blibliTotal = await blibli.getTotal(searches: search);
+    try {
+      dynamic tokopediaTotal = await tokopedia.getTotal(searches: search);
+      dynamic ebayTotal = await ebay.getTotal(searches: search);
+      dynamic bukalapakTotal = await bukalapak.getTotal(searches: search);
+      dynamic blibliTotal = await blibli.getTotal(searches: search);
 
-    tokopediaTotal = tokopediaTotal.replaceAll(',', '');
-    tokopediaTotal = int.parse(tokopediaTotal);
-    ebayTotal = ebayTotal.replaceAll(',', '');
-    ebayTotal = int.parse(ebayTotal);
-    bukalapakTotal = bukalapakTotal.replaceAll(',', '');
-    bukalapakTotal = int.parse(bukalapakTotal);
-    blibliTotal = blibliTotal.replaceAll(',', '');
-    blibliTotal = int.parse(blibliTotal);
+      tokopediaTotal = tokopediaTotal.replaceAll(',', '');
+      tokopediaTotal = int.parse(tokopediaTotal);
+      ebayTotal = ebayTotal.replaceAll(',', '');
+      ebayTotal = int.parse(ebayTotal);
+      bukalapakTotal = bukalapakTotal.replaceAll(',', '');
+      bukalapakTotal = int.parse(bukalapakTotal);
+      blibliTotal = blibliTotal.replaceAll(',', '');
+      blibliTotal = int.parse(blibliTotal);
 
-    combinedTotal = tokopediaTotal + ebayTotal + bukalapakTotal + blibliTotal;
+      combinedTotal = tokopediaTotal + ebayTotal + bukalapakTotal + blibliTotal;
 
-    log('Combined total: $combinedTotal');
+      log('Combined total: $combinedTotal');
 
-    return combinedTotal;
+      return combinedTotal;
+    } on NoSuchMethodError {}
   }
 }
 

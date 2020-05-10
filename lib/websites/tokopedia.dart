@@ -15,24 +15,28 @@ class Tokopedia {
   int topAdsLength;
 
   Future<dynamic> getTotal({String searches}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    var json = await getJson(pages: 0);
-    var total = json[0]['data']['searchProduct']['totalData'];
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+      var json = await getJson(pages: 0);
+      var total = json[0]['data']['searchProduct']['totalData'];
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<List<ImageModel>> getTokopedia({String searches, int page}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    var json = await getJson(pages: page);
-    List<ImageModel> items = getData(json: json);
+      var json = await getJson(pages: page);
+      List<ImageModel> items = getData(json: json);
 
-    return items;
+      return items;
+    } on NoSuchMethodError {}
   }
 
   Future<List<ImageModel>> getAds({String searches}) async {
@@ -67,6 +71,13 @@ class Tokopedia {
         imageModel.img = json[1]['data']['displayAdsV3']['data'][x]['product']
             ['image']['imageUrl'];
         imageModel.website = 'Tokopedia';
+        imageModel.rating = json[1]['data']['displayAdsV3']['data'][x]
+                ['product']['rating'] ~/
+            20;
+        String tempReview = json[1]['data']['displayAdsV3']['data'][x]
+            ['product']['countReviewFormat'];
+        tempReview = tempReview.replaceAll('.', '');
+        imageModel.reviews = int.parse(tempReview);
         items.add(imageModel);
       }
       return items;
@@ -94,6 +105,10 @@ class Tokopedia {
       imageModel.img =
           json[0]['data']['searchProduct']['products'][x]['imageURL'];
       imageModel.website = 'Tokopedia';
+      imageModel.rating =
+          json[0]['data']['searchProduct']['products'][x]['rating'];
+      imageModel.reviews =
+          json[0]['data']['searchProduct']['products'][x]['countReview'];
       items.add(imageModel);
     }
     return items;
@@ -312,8 +327,8 @@ class _TokopediaGridViewState extends State<TokopediaGridView>
         url: tokopediaItems[i].url,
         image: tokopediaItems[i].img,
         price: tokopediaItems[i].price,
-        reviews: 12,
-        rating: 4,
+        reviews: tokopediaItems[i].reviews,
+        rating: tokopediaItems[i].rating,
       ),
       itemCount: tokopediaItems.length,
     );
@@ -342,7 +357,6 @@ class _TokopediaGridViewState extends State<TokopediaGridView>
           if (tokopediaSorted == false) {
             tokopediaItems.clear();
             await Future.delayed(Duration(milliseconds: 1000));
-            log('$globalSearch');
             tokopediaCounter = 0;
             tokopediaItems = await tokopedia.getAds(searches: globalSearch);
           } else {

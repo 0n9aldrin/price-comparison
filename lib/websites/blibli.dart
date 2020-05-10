@@ -16,32 +16,38 @@ class Blibli {
   var future;
 
   Future<dynamic> getTotal({String searches}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    var json = await getJson(page: 0);
-    var total = json['data']['paging']['total_item'];
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+      var json = await getJson(page: 0);
+      var total = json['data']['paging']['total_item'];
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<dynamic> getTotal1({String searches, int page}) async {
-    future = await getBlibli(searches: searches, page: page);
-    var total = json['data']['paging']['total_item'];
-    total = '$total'.replaceAllMapped(
-        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-    return total;
+    try {
+      future = await getBlibli(searches: searches, page: page);
+      var total = json['data']['paging']['total_item'];
+      total = '$total'.replaceAllMapped(
+          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      return total;
+    } on NoSuchMethodError {}
   }
 
   Future<List<ImageModel>> getBlibli({String searches, int page}) async {
-    search = searches;
-    search = search.replaceAll(' ', '%20');
+    try {
+      search = searches;
+      search = search.replaceAll(' ', '%20');
 
-    json = await getJson(page: page);
-    List<ImageModel> items = getData(json: json);
+      json = await getJson(page: page);
+      List<ImageModel> items = getData(json: json);
 
-    return items;
+      return items;
+    } on NoSuchMethodError {}
   }
 
   List<ImageModel> getData({var json}) {
