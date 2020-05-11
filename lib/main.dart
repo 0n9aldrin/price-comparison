@@ -64,20 +64,9 @@ class _MyHomePageState extends State<MyHomePage>
   Lazada lazada = Lazada();
   Shopee shopee = Shopee();
   File _file;
+  FocusNode myFocusNode;
 
-  Widget _appBarTitle = GestureDetector(
-    onTap: () {
-      log("app bar tapped");
-    },
-    child: Row(
-      children: <Widget>[
-        Icon(Icons.search),
-        Text('Combined Search'),
-      ],
-    ),
-  );
-
-  Icon _searchIcon = Platform.isIOS
+  Widget _searchIcon = Platform.isIOS
       ? Icon(
           CupertinoIcons.search,
           color: CupertinoColors.activeBlue,
@@ -90,10 +79,13 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+    myFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    myFocusNode.dispose();
     super.dispose();
   }
 
@@ -162,47 +154,44 @@ class _MyHomePageState extends State<MyHomePage>
         child: SafeArea(
           child: Scaffold(
             appBar: CupertinoNavigationBar(
-              leading: IconButton(
-                  icon: _searchIcon,
-                  onPressed: () {
-                    setState(() {
-                      if (_searchIcon.icon == CupertinoIcons.search) {
-                        _appBarTitle = CupertinoTextField(
-                          onSubmitted: (value) {
-                            setState(() {
-                              globalSearch = value;
-                              log('submit: $globalSearch');
-                            });
-                          },
-                          placeholder: 'Search...',
-                          placeholderStyle:
-                              TextStyle(color: CupertinoColors.activeBlue),
-                          style: TextStyle(color: CupertinoColors.activeBlue),
-                        );
-//                            TextField(
-//                          onSubmitted: (value) {
-//                            setState(() {
-//                              globalSearch = value;
-//                              log('submit: $globalSearch');
-//                            });
-//                          },
-//                          decoration:
-//                              new InputDecoration(hintText: 'Search...'),
-//                        );
-                        _searchIcon = Icon(
-                          CupertinoIcons.clear_thick,
-                          color: CupertinoColors.activeBlue,
-                        );
-                      } else {
-                        _searchIcon = Icon(
-                          CupertinoIcons.search,
-                          color: CupertinoColors.activeBlue,
-                        );
-                        _appBarTitle = Text('Combined Search');
-                      }
-                    });
-                  }),
-              middle: _appBarTitle,
+              middle: Row(
+                children: <Widget>[
+                  GestureDetector(
+                    child: _searchIcon,
+                    onTap: () {
+                      setState(() {
+                        _searchIcon = Container();
+                        myFocusNode.requestFocus();
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      textInputAction: TextInputAction.search,
+                      focusNode: myFocusNode,
+                      onSubmitted: (value) {
+                        setState(() {
+                          _searchIcon = Platform.isIOS
+                              ? Icon(
+                                  CupertinoIcons.search,
+                                  color: CupertinoColors.activeBlue,
+                                )
+                              : Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                );
+                          globalSearch = value;
+                          log('submit: $globalSearch');
+                        });
+                      },
+                      decoration: new InputDecoration(hintText: 'Search...'),
+                    ),
+                  ),
+                ],
+              ),
               trailing: Icon(
                 CupertinoIcons.photo_camera_solid,
                 color: Colors.blue,
@@ -250,7 +239,44 @@ class _MyHomePageState extends State<MyHomePage>
         child: SafeArea(
           child: Scaffold(
             appBar: AppBar(
-              title: _appBarTitle,
+              title: Row(
+                children: <Widget>[
+                  GestureDetector(
+                    child: _searchIcon,
+                    onTap: () {
+                      setState(() {
+                        _searchIcon = Container();
+                        myFocusNode.requestFocus();
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      textInputAction: TextInputAction.search,
+                      focusNode: myFocusNode,
+                      onSubmitted: (value) {
+                        setState(() {
+                          _searchIcon = Platform.isIOS
+                              ? Icon(
+                                  CupertinoIcons.search,
+                                  color: CupertinoColors.activeBlue,
+                                )
+                              : Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                );
+                          globalSearch = value;
+                          log('submit: $globalSearch');
+                        });
+                      },
+                      decoration: new InputDecoration(hintText: 'Search...'),
+                    ),
+                  ),
+                ],
+              ),
               actions: <Widget>[
                 IconButton(
                     icon: Icon(
@@ -271,34 +297,6 @@ class _MyHomePageState extends State<MyHomePage>
                       }
                     })
               ],
-              leading: IconButton(
-                  icon: _searchIcon,
-                  onPressed: () {
-                    setState(() {
-                      if (_searchIcon.icon == Icons.search) {
-                        _appBarTitle = TextField(
-                          onSubmitted: (value) {
-                            setState(() {
-                              globalSearch = value;
-                              log('submit: $globalSearch');
-                            });
-                          },
-                          decoration:
-                              new InputDecoration(hintText: 'Search...'),
-                        );
-                        _searchIcon = Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        );
-                      } else {
-                        _searchIcon = Icon(
-                          Icons.search,
-                          color: Colors.white,
-                        );
-                        _appBarTitle = Text('Combined Search');
-                      }
-                    });
-                  }),
               bottom: TabBar(
                 tabs: [
                   Tab(
