@@ -171,16 +171,6 @@ class _BukalapakGridViewState extends State<BukalapakGridView>
     );
   }
 
-//  @override
-//  void initState() {
-//    super.initState();
-//    blibli.getBlibli(page: counter, searches: globalSearch).then((result) {
-//      setState(() {
-//        data = result;
-//      });
-//    });
-//  }
-
   @override
   Widget build(BuildContext context) {
     return SmartRefresher(
