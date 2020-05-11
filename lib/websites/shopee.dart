@@ -31,7 +31,7 @@ class Shopee {
   Future<dynamic> getTotal1({String searches, int page}) async {
     try {
       future = await getShopee(searches: searches, page: page);
-      var total = json['total_count'];
+      var total = json[0]['total'];
       total = '$total'.replaceAllMapped(
           new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
       return total;
@@ -51,63 +51,86 @@ class Shopee {
 
   List<ImageModel> getData({var json}) {
     List<ImageModel> items = [];
-    for (int x = 0; x < searchLength; x++) {
+    for (int x = 1; x < searchLength; x++) {
       ImageModel imageModel = ImageModel();
-      String tempPrice =
-          (json['items'][x]['price'] / 100000).toStringAsFixed(0);
+//      String tempPrice =
+//          (json['items'][x]['price'] / 100000).toStringAsFixed(0);
+//      tempPrice = '$tempPrice'.replaceAllMapped(
+//          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+//      imageModel.title = json['items'][x]['name'];
+//      imageModel.price = tempPrice;
+//      String shopId = json['items'][x]['shopid'].toString();
+//      String itemId = json['items'][x]['itemid'].toString();
+//      String url = 'https://shopee.co.id/' +
+//          json['items'][x]['name'].replaceAll(' ', '-') +
+//          '-i.' +
+//          shopId +
+//          '.' +
+//          itemId;
+//      imageModel.url = url;
+//      imageModel.img =
+//          'https://cf.shopee.co.id/file/' + json['items'][x]['image'];
+//      imageModel.website = 'Shopee';
+//      imageModel.rating =
+//          json['items'][x]['item_rating']['rating_star'].round();
+//      var reviewCount = 0;
+//      if (imageModel.rating != 0) {
+//        reviewCount = json['items'][x]['item_rating']['rating_count'][0];
+//      }
+
+//      imageModel.reviews = reviewCount;
+      String tempPrice = (json[x]['price']).toStringAsFixed(0);
       tempPrice = '$tempPrice'.replaceAllMapped(
           new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-      imageModel.title = json['items'][x]['name'];
+      imageModel.title = json[x]['name'];
       imageModel.price = tempPrice;
-      String shopId = json['items'][x]['shopid'].toString();
-      String itemId = json['items'][x]['itemid'].toString();
-      String url = 'https://shopee.co.id/' +
-          json['items'][x]['name'].replaceAll(' ', '-') +
-          '-i.' +
-          shopId +
-          '.' +
-          itemId;
-      imageModel.url = url;
-      imageModel.img =
-          'https://cf.shopee.co.id/file/' + json['items'][x]['image'];
+      imageModel.url = json[x]['url'];
+      imageModel.img = json[x]['image_url'];
       imageModel.website = 'Shopee';
-      imageModel.rating =
-          json['items'][x]['item_rating']['rating_star'].round();
+      imageModel.rating = json[x]['rating'].round();
       var reviewCount = 0;
       if (imageModel.rating != 0) {
-        reviewCount = json['items'][x]['item_rating']['rating_count'][0];
+        reviewCount = json[x]['review_count'];
       }
-
       imageModel.reviews = reviewCount;
-
       items.add(imageModel);
     }
     return items;
   }
 
   Future<dynamic> getJson({int page}) async {
-    int start = page * 50;
-    var headers = {
-      'if-none-match-': '55b03-e17607803099ed81f4097a6d08057af3',
-    };
-
-    var params = {
-      'by': 'relevancy',
-      'keyword': '$search',
-      'limit': '50',
-      'newest': '$start',
-      'order': 'desc',
-      'page_type': 'search',
-      'version': '2',
-    };
-    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
-
-    var res = await http.get('https://shopee.co.id/api/v2/search_items/?$query',
-        headers: headers);
+//    int start = page * 50;
+//    var headers = {
+//      'if-none-match-': '55b03-e17607803099ed81f4097a6d08057af3',
+//    };
+//
+//    var params = {
+//      'by': 'relevancy',
+//      'keyword': '$search',
+//      'limit': '50',
+//      'newest': '$start',
+//      'order': 'desc',
+//      'page_type': 'search',
+//      'version': '2',
+//    };
+//    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
+//
+//    var res = await http.get('https://shopee.co.id/api/v2/search_items/?$query',
+//        headers: headers);
+//    if (res.statusCode == 200) {
+//      String data = res.body;
+//      dynamic json = jsonDecode(data);
+//      searchLength = json['items'].length;
+//      return json;
+//    } else {
+//      throw Exception('Blibli error: statusCode= ${res.statusCode}');
+//    }
+    var res = await http.get(
+        'https://price-web-scraper.herokuapp.com/api/?keyword=$search&page=$page');
     if (res.statusCode == 200) {
       String data = res.body;
       dynamic json = jsonDecode(data);
-      searchLength = json['items'].length;
+      searchLength = json.length;
       return json;
     } else {
       throw Exception('Blibli error: statusCode= ${res.statusCode}');

@@ -65,7 +65,18 @@ class _MyHomePageState extends State<MyHomePage>
   Shopee shopee = Shopee();
   File _file;
 
-  Widget _appBarTitle = Text('Combined Search');
+  Widget _appBarTitle = GestureDetector(
+    onTap: () {
+      log("app bar tapped");
+    },
+    child: Row(
+      children: <Widget>[
+        Icon(Icons.search),
+        Text('Combined Search'),
+      ],
+    ),
+  );
+
   Icon _searchIcon = Platform.isIOS
       ? Icon(
           CupertinoIcons.search,
