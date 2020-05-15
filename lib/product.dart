@@ -1,4 +1,4 @@
-class ImageModel {
+class Product {
   String title;
   String url;
   dynamic price;
@@ -8,7 +8,7 @@ class ImageModel {
   int rating;
   int reviews;
 
-  List<ImageModel> removeDuplicates({List<ImageModel> data}) {
+  List<Product> removeDuplicates({List<Product> data}) {
     int z;
     int y = 0;
     while (y < data.length) {

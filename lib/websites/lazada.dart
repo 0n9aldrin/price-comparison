@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
-import '../image_model.dart';
+import '../product.dart';
 
 class Lazada {
   String search;
@@ -14,21 +14,21 @@ class Lazada {
     return total;
   }
 
-  Future<List<ImageModel>> getLazada({String searches, int page}) async {
+  Future<List<Product>> getLazada({String searches, int page}) async {
     search = searches;
     search = search.replaceAll(' ', '%20');
 
     var html = await getHtml(page: page);
     html = parse(html);
-    List<ImageModel> items = getData(html: html);
+    List<Product> items = getData(html: html);
 //    for (int x = 0; x < items.length; x++) {
 //      print(items[x].img);
 //    }
     return items;
   }
 
-  List<ImageModel> getData({var html}) {
-    List<ImageModel> items = [];
+  List<Product> getData({var html}) {
+    List<Product> items = [];
     List element = html.querySelectorAll('#root > div');
 
     return (items);

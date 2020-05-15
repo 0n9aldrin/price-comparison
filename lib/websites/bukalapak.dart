@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../Item.dart';
-import '../image_model.dart';
+import '../product.dart';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:pricecomparison/main.dart';
@@ -43,14 +43,14 @@ class Bukalapak {
     } on NoSuchMethodError {}
   }
 
-  Future<List<ImageModel>> getBukalapak({String searches, int page}) async {
+  Future<List<Product>> getBukalapak({String searches, int page}) async {
     try {
       search = searches;
       search = search.replaceAll(' ', '%20');
 
       html = await getHtml(page: page);
       html = parse(html);
-      List<ImageModel> items = getData(html: html);
+      List<Product> items = getData(html: html);
 //    for (int x = 0; x < items.length; x++) {
 //      print(items[x].img);
 //    }
@@ -58,11 +58,11 @@ class Bukalapak {
     } on NoSuchMethodError {}
   }
 
-  List<ImageModel> getData({var html}) {
-    List<ImageModel> items = [];
+  List<Product> getData({var html}) {
+    List<Product> items = [];
     List element = html.querySelectorAll('li.col-12--2');
     for (int x = 0; x < element.length; x++) {
-      ImageModel imageModel = ImageModel();
+      Product imageModel = Product();
       var nameElement = element[x]
           .querySelector('div.product-card > article > div.product-media > a');
       var priceElement = element[x].querySelector(
@@ -206,7 +206,7 @@ class _BukalapakGridViewState extends State<BukalapakGridView>
           await Future.delayed(Duration(milliseconds: 1000));
           bukalapakCounter++;
           log('Loading Page $bukalapakCounter');
-          List<ImageModel> tempList = await widget.bukalapak
+          List<Product> tempList = await widget.bukalapak
               .getBukalapak(searches: globalSearch, page: bukalapakCounter);
           for (int x = 0; x < tempList.length; x++) {
             bukalapakItems.add(tempList[x]);

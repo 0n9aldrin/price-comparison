@@ -6,7 +6,7 @@ import 'websites/bukalapak.dart';
 import 'websites/ebay.dart';
 import 'websites/blibli.dart';
 import 'websites/tokopedia.dart' as tok;
-import 'image_model.dart';
+import 'product.dart';
 import 'dart:developer';
 import 'main.dart';
 import 'dart:io';
@@ -19,10 +19,10 @@ class CombineHelper {
   Blibli blibli = Blibli();
   Shopee shopee = Shopee();
 
-  List<ImageModel> combinedList = [];
+  List<Product> combinedList = [];
   int combinedTotal;
 
-  Future<List<ImageModel>> combineLists({var search, int page}) async {
+  Future<List<Product>> combineLists({var search, int page}) async {
     combinedList.clear();
     var tokopediaList =
         await tokopedia.getTokopedia(searches: search, page: page);
@@ -159,7 +159,7 @@ class _CombinedGridViewState extends State<CombinedGridView>
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   CombineHelper combineHelper = CombineHelper();
-  List<ImageModel> data;
+  List<Product> data;
 
   Widget buildCtn() {
     if (globalSearch == null) {
@@ -255,7 +255,7 @@ class _CombinedGridViewState extends State<CombinedGridView>
           await Future.delayed(Duration(milliseconds: 1000));
           combinedCounter++;
           log('Loading Page $combinedCounter');
-          List<ImageModel> tempList = await combineHelper.combineLists(
+          List<Product> tempList = await combineHelper.combineLists(
               search: globalSearch, page: combinedCounter);
           log('Length of b4 added data: ${data.length}');
 
@@ -271,7 +271,7 @@ class _CombinedGridViewState extends State<CombinedGridView>
           log('Done merging');
 
           log('Length before kill: ${data.length}');
-          ImageModel imageModel = ImageModel();
+          Product imageModel = Product();
 
           data = imageModel.removeDuplicates(data: data);
           log('Length after kill: ${data.length}');

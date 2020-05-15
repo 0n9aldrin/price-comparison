@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'dart:convert';
-import '../image_model.dart';
+import '../product.dart';
 import 'dart:developer';
 import 'package:pricecomparison/main.dart';
 import 'dart:io';
@@ -38,47 +38,21 @@ class Shopee {
     } on NoSuchMethodError {}
   }
 
-  Future<List<ImageModel>> getShopee({String searches, int page}) async {
+  Future<List<Product>> getShopee({String searches, int page}) async {
     try {
       search = searches;
       search = search.replaceAll(' ', '%20');
       json = await getJson(page: page);
-      List<ImageModel> items = getData(json: json);
+      List<Product> items = getData(json: json);
 
       return items;
     } on NoSuchMethodError {}
   }
 
-  List<ImageModel> getData({var json}) {
-    List<ImageModel> items = [];
+  List<Product> getData({var json}) {
+    List<Product> items = [];
     for (int x = 1; x < searchLength; x++) {
-      ImageModel imageModel = ImageModel();
-//      String tempPrice =
-//          (json['items'][x]['price'] / 100000).toStringAsFixed(0);
-//      tempPrice = '$tempPrice'.replaceAllMapped(
-//          new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
-//      imageModel.title = json['items'][x]['name'];
-//      imageModel.price = tempPrice;
-//      String shopId = json['items'][x]['shopid'].toString();
-//      String itemId = json['items'][x]['itemid'].toString();
-//      String url = 'https://shopee.co.id/' +
-//          json['items'][x]['name'].replaceAll(' ', '-') +
-//          '-i.' +
-//          shopId +
-//          '.' +
-//          itemId;
-//      imageModel.url = url;
-//      imageModel.img =
-//          'https://cf.shopee.co.id/file/' + json['items'][x]['image'];
-//      imageModel.website = 'Shopee';
-//      imageModel.rating =
-//          json['items'][x]['item_rating']['rating_star'].round();
-//      var reviewCount = 0;
-//      if (imageModel.rating != 0) {
-//        reviewCount = json['items'][x]['item_rating']['rating_count'][0];
-//      }
-
-//      imageModel.reviews = reviewCount;
+      Product imageModel = Product();
       String tempPrice = (json[x]['price']).toStringAsFixed(0);
       tempPrice = '$tempPrice'.replaceAllMapped(
           new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
@@ -99,32 +73,6 @@ class Shopee {
   }
 
   Future<dynamic> getJson({int page}) async {
-//    int start = page * 50;
-//    var headers = {
-//      'if-none-match-': '55b03-e17607803099ed81f4097a6d08057af3',
-//    };
-//
-//    var params = {
-//      'by': 'relevancy',
-//      'keyword': '$search',
-//      'limit': '50',
-//      'newest': '$start',
-//      'order': 'desc',
-//      'page_type': 'search',
-//      'version': '2',
-//    };
-//    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
-//
-//    var res = await http.get('https://shopee.co.id/api/v2/search_items/?$query',
-//        headers: headers);
-//    if (res.statusCode == 200) {
-//      String data = res.body;
-//      dynamic json = jsonDecode(data);
-//      searchLength = json['items'].length;
-//      return json;
-//    } else {
-//      throw Exception('Blibli error: statusCode= ${res.statusCode}');
-//    }
     var res = await http.get(
         'https://price-web-scraper.herokuapp.com/api/?keyword=$search&page=$page');
     if (res.statusCode == 200) {
@@ -238,7 +186,7 @@ class ShopeeGridViewState extends State<ShopeeGridView>
         if (shopeeItems != null) {
           await Future.delayed(Duration(milliseconds: 1000));
           shopeeCounter++;
-          List<ImageModel> tempList = await widget.shopee
+          List<Product> tempList = await widget.shopee
               .getShopee(page: shopeeCounter, searches: globalSearch);
           for (int x = 0; x < tempList.length; x++) {
             shopeeItems.add(tempList[x]);

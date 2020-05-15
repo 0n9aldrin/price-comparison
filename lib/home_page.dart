@@ -14,7 +14,6 @@ import 'dart:async';
 import 'dart:io';
 import 'main.dart';
 
-
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -34,13 +33,13 @@ class _MyHomePageState extends State<MyHomePage>
 
   Widget _searchIcon = Platform.isIOS
       ? Icon(
-    CupertinoIcons.search,
-    color: CupertinoColors.activeBlue,
-  )
+          CupertinoIcons.search,
+          color: CupertinoColors.activeBlue,
+        )
       : Icon(
-    Icons.search,
-    color: Colors.white,
-  );
+          Icons.search,
+          color: Colors.white,
+        );
 
   @override
   void initState() {
@@ -69,13 +68,21 @@ class _MyHomePageState extends State<MyHomePage>
     if (segmentedControlGroupValue == 0) {
       return TokopediaGridView();
     } else if (segmentedControlGroupValue == 1) {
-      return BlibliGridView();
+      return BlibliGridView(
+        blibli: blibli,
+      );
     } else if (segmentedControlGroupValue == 2) {
-      return EbayGridView();
+      return EbayGridView(
+        ebay: ebay,
+      );
     } else if (segmentedControlGroupValue == 3) {
-      return BukalapakGridView();
+      return BukalapakGridView(
+        bukalapak: bukalapak,
+      );
     } else if (segmentedControlGroupValue == 4) {
-      return ShopeeGridView();
+      return ShopeeGridView(
+        shopee: shopee,
+      );
     } else if (segmentedControlGroupValue == 4) {
       return CombinedGridView();
     }
@@ -142,13 +149,13 @@ class _MyHomePageState extends State<MyHomePage>
                         setState(() {
                           _searchIcon = Platform.isIOS
                               ? Icon(
-                            CupertinoIcons.search,
-                            color: CupertinoColors.activeBlue,
-                          )
+                                  CupertinoIcons.search,
+                                  color: CupertinoColors.activeBlue,
+                                )
                               : Icon(
-                            Icons.search,
-                            color: Colors.white,
-                          );
+                                  Icons.search,
+                                  color: Colors.white,
+                                );
                           globalSearch = value;
                           log('submit: $globalSearch');
                         });
@@ -227,13 +234,13 @@ class _MyHomePageState extends State<MyHomePage>
                         setState(() {
                           _searchIcon = Platform.isIOS
                               ? Icon(
-                            CupertinoIcons.search,
-                            color: CupertinoColors.activeBlue,
-                          )
+                                  CupertinoIcons.search,
+                                  color: CupertinoColors.activeBlue,
+                                )
                               : Icon(
-                            Icons.search,
-                            color: Colors.white,
-                          );
+                                  Icons.search,
+                                  color: Colors.white,
+                                );
                           globalSearch = value;
                           log('submit: $globalSearch');
                         });
@@ -306,7 +313,7 @@ class _MyHomePageState extends State<MyHomePage>
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child:
-                                  Text('Total results: ${snapshot.data}'),
+                                      Text('Total results: ${snapshot.data}'),
                                 ),
                               );
                             },
@@ -330,185 +337,185 @@ class _MyHomePageState extends State<MyHomePage>
                 ),
                 Scrollbar(
                     child: Stack(
+                  children: <Widget>[
+                    Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: EbayGridView(
-                                ebay: ebay,
-                              ),
-                            ),
-                            totalWidget(
-                              future: ebay.getTotal1(
-                                  searches: globalSearch, page: ebayCounter),
-                            )
-                          ],
-                        ),
-                        Positioned(
-                          bottom: 40,
-                          right: 15,
-                          child: FancyFab(
-                            onPressedPrice: () {
-                              sortDataByPrice(list: ebayItems);
-                              ebaySorted = true;
-                              setState(() {});
-                            },
+                        Expanded(
+                          child: EbayGridView(
+                            ebay: ebay,
                           ),
                         ),
+                        totalWidget(
+                          future: ebay.getTotal1(
+                              searches: globalSearch, page: ebayCounter),
+                        )
                       ],
-                    )),
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      right: 15,
+                      child: FancyFab(
+                        onPressedPrice: () {
+                          sortDataByPrice(list: ebayItems);
+                          ebaySorted = true;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                )),
                 Scrollbar(
                     child: Stack(
+                  children: <Widget>[
+                    Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: BlibliGridView(
-                                blibli: blibli,
-                              ),
-                            ),
-                            FutureBuilder(
-                              builder: (context, snapshot) {
-                                return Container(
-                                  color: Colors.grey,
-                                  height: 28.0,
-                                  padding: EdgeInsets.only(left: 20.0),
-                                  child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child:
-                                      Text('Total results: ${snapshot.data}')),
-                                );
-                              },
-                              future: blibli.getTotal1(
-                                  searches: globalSearch, page: blibliCounter),
-                            )
-                          ],
-                        ),
-                        Positioned(
-                          bottom: 40,
-                          right: 15,
-                          child: FancyFab(
-                            onPressedPrice: () {
-                              sortDataByPrice(list: blibliItems);
-                              blibliSorted = true;
-                              setState(() {});
-                            },
+                        Expanded(
+                          child: BlibliGridView(
+                            blibli: blibli,
                           ),
                         ),
+                        FutureBuilder(
+                          builder: (context, snapshot) {
+                            return Container(
+                              color: Colors.grey,
+                              height: 28.0,
+                              padding: EdgeInsets.only(left: 20.0),
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child:
+                                      Text('Total results: ${snapshot.data}')),
+                            );
+                          },
+                          future: blibli.getTotal1(
+                              searches: globalSearch, page: blibliCounter),
+                        )
                       ],
-                    )),
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      right: 15,
+                      child: FancyFab(
+                        onPressedPrice: () {
+                          sortDataByPrice(list: blibliItems);
+                          blibliSorted = true;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                )),
                 Scrollbar(
                     child: Stack(
+                  children: <Widget>[
+                    Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: BukalapakGridView(
-                                bukalapak: bukalapak,
-                              ),
-                            ),
-                            FutureBuilder(
-                              builder: (context, snapshot) {
-                                return Container(
-                                  color: Colors.grey,
-                                  height: 28.0,
-                                  padding: EdgeInsets.only(left: 20.0),
-                                  child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child:
-                                      Text('Total results: ${snapshot.data}')),
-                                );
-                              },
-                              future: bukalapak.getTotal1(
-                                  searches: globalSearch, page: bukalapakCounter),
-                            )
-                          ],
-                        ),
-                        Positioned(
-                          bottom: 40,
-                          right: 15,
-                          child: FancyFab(
-                            onPressedPrice: () {
-                              sortDataByPrice(list: bukalapakItems);
-                              bukalapakSorted = true;
-                              setState(() {});
-                            },
+                        Expanded(
+                          child: BukalapakGridView(
+                            bukalapak: bukalapak,
                           ),
                         ),
+                        FutureBuilder(
+                          builder: (context, snapshot) {
+                            return Container(
+                              color: Colors.grey,
+                              height: 28.0,
+                              padding: EdgeInsets.only(left: 20.0),
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child:
+                                      Text('Total results: ${snapshot.data}')),
+                            );
+                          },
+                          future: bukalapak.getTotal1(
+                              searches: globalSearch, page: bukalapakCounter),
+                        )
                       ],
-                    )),
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      right: 15,
+                      child: FancyFab(
+                        onPressedPrice: () {
+                          sortDataByPrice(list: bukalapakItems);
+                          bukalapakSorted = true;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                )),
                 Scrollbar(
                     child: Stack(
+                  children: <Widget>[
+                    Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: ShopeeGridView(
-                                shopee: shopee,
-                              ),
-                            ),
-                            FutureBuilder(
-                              builder: (context, snapshot) {
-                                return Container(
-                                  color: Colors.grey,
-                                  height: 28.0,
-                                  padding: EdgeInsets.only(left: 20.0),
-                                  child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child:
-                                      Text('Total results: ${snapshot.data}')),
-                                );
-                              },
-                              future: shopee.getTotal1(
-                                  searches: globalSearch, page: shopeeCounter),
-                            )
-                          ],
-                        ),
-                        Positioned(
-                          bottom: 40,
-                          right: 15,
-                          child: FancyFab(
-                            onPressedPrice: () {
-                              sortDataByPrice(list: shopeeItems);
-                              shopeeSorted = true;
-                              setState(() {});
-                            },
+                        Expanded(
+                          child: ShopeeGridView(
+                            shopee: shopee,
                           ),
                         ),
+                        FutureBuilder(
+                          builder: (context, snapshot) {
+                            return Container(
+                              color: Colors.grey,
+                              height: 28.0,
+                              padding: EdgeInsets.only(left: 20.0),
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child:
+                                      Text('Total results: ${snapshot.data}')),
+                            );
+                          },
+                          future: shopee.getTotal1(
+                              searches: globalSearch, page: shopeeCounter),
+                        )
                       ],
-                    )),
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      right: 15,
+                      child: FancyFab(
+                        onPressedPrice: () {
+                          sortDataByPrice(list: shopeeItems);
+                          shopeeSorted = true;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                )),
                 Scrollbar(
                     child: Stack(
+                  children: <Widget>[
+                    Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: CombinedGridView(),
-                            ),
-                            FutureBuilder(
-                              builder: (context, snapshot) {
-                                return Container(
-                                  color: Colors.grey,
-                                  height: 28.0,
-                                  padding: EdgeInsets.only(left: 20.0),
-                                  child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child:
+                        Expanded(
+                          child: CombinedGridView(),
+                        ),
+                        FutureBuilder(
+                          builder: (context, snapshot) {
+                            return Container(
+                              color: Colors.grey,
+                              height: 28.0,
+                              padding: EdgeInsets.only(left: 20.0),
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child:
                                       Text('Total results: ${snapshot.data}')),
-                                );
-                              },
-                              future:
+                            );
+                          },
+                          future:
                               combineHelper.combineTotal(search: globalSearch),
-                            ),
-                          ],
-                        ),
-                        Positioned(
-                          bottom: 40,
-                          right: 15,
-                          child: FancyFab(),
                         ),
                       ],
-                    )),
+                    ),
+                    Positioned(
+                      bottom: 40,
+                      right: 15,
+                      child: FancyFab(),
+                    ),
+                  ],
+                )),
               ],
             ),
           ),

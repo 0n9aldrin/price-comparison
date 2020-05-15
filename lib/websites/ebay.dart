@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../Item.dart';
-import '../image_model.dart';
+import '../product.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:pricecomparison/main.dart';
@@ -14,14 +14,14 @@ class Ebay {
   var future;
   var html;
 
-  Future<List<ImageModel>> getEbay({String searches, int page}) async {
+  Future<List<Product>> getEbay({String searches, int page}) async {
     try {
       search = searches;
       search = search.replaceAll(' ', '+');
 
       html = await getHtml(page: page);
       html = parse(html);
-      List<ImageModel> items = getData(html: html);
+      List<Product> items = getData(html: html);
       return items;
     } on NoSuchMethodError {}
   }
@@ -50,15 +50,15 @@ class Ebay {
     } on NoSuchMethodError {}
   }
 
-  List<ImageModel> getData({var html}) {
-    List<ImageModel> items = [];
+  List<Product> getData({var html}) {
+    List<Product> items = [];
 
     var products = html.querySelector('ul.srp-results.srp-list.clearfix');
     List a = [];
     a = products.querySelectorAll('li.s-item    ');
 
     for (int x = 0; x < a.length; x++) {
-      ImageModel imageModel = ImageModel();
+      Product imageModel = Product();
       var nameElement =
           a[x].querySelector('div > div.s-item__info.clearfix > a');
       var priceElement = a[x].querySelector(
@@ -235,7 +235,7 @@ class _EbayGridViewState extends State<EbayGridView>
         if (ebayItems != null) {
           await Future.delayed(Duration(milliseconds: 1000));
           ebayCounter++;
-          List<ImageModel> tempList = await widget.ebay
+          List<Product> tempList = await widget.ebay
               .getEbay(searches: globalSearch, page: ebayCounter);
           for (int x = 0; x < tempList.length; x++) {
             ebayItems.add(tempList[x]);

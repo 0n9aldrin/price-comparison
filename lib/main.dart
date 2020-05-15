@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pricecomparison/fancy_fab.dart';
-import 'package:pricecomparison/image_model.dart';
-import 'package:pricecomparison/websites/lazada.dart';
-import 'package:pricecomparison/websites/shopee.dart';
-import 'websites/blibli.dart';
-import 'websites/tokopedia.dart';
+import 'package:pricecomparison/product.dart';
 import 'dart:developer';
-import 'websites/ebay.dart';
-import 'websites/bukalapak.dart';
 import 'combined.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:async';
-import 'dart:io';
 import 'home_page.dart';
 
 void main() => runApp(MyApp());
@@ -39,14 +29,14 @@ int lazadaCounter = 1;
 int shopeeCounter = 0;
 int combinedCounter = 0;
 
-// List of objects (ImageModel) to store product information
-List<ImageModel> blibliItems;
-List<ImageModel> tokopediaItems;
-List<ImageModel> bukalapakItems;
-List<ImageModel> ebayItems;
-List<ImageModel> lazadaItems;
-List<ImageModel> shopeeItems;
-List<ImageModel> combinedItems;
+// List of objects (Product) to store product information
+List<Product> blibliItems;
+List<Product> tokopediaItems;
+List<Product> bukalapakItems;
+List<Product> ebayItems;
+List<Product> lazadaItems;
+List<Product> shopeeItems;
+List<Product> combinedItems;
 
 // Boolean to determine whether data is sorted
 bool combinedSorted = false;
@@ -58,7 +48,7 @@ bool bukalapakSorted = false;
 bool blibliSorted = false;
 
 // Converts the price to string and format with commas
-void convertPriceToString({List<ImageModel> list}) {
+void convertPriceToString({List<Product> list}) {
   for (int x = 0; x < list.length; x++) {
     list[x].price = '${list[x].price}'.replaceAllMapped(
         new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
@@ -66,7 +56,7 @@ void convertPriceToString({List<ImageModel> list}) {
 }
 
 // Converts the price to an integer fro comparisons
-void convertPriceToInt({List<ImageModel> list}) {
+void convertPriceToInt({List<Product> list}) {
   for (int x = 0; x < list.length; x++) {
     list[x].price = list[x].price.replaceAll(',', '');
     list[x].price = int.parse(list[x].price);
@@ -74,7 +64,7 @@ void convertPriceToInt({List<ImageModel> list}) {
 }
 
 // Sorts the data by price
-void sortDataByPrice({List<ImageModel> list}) {
+void sortDataByPrice({List<Product> list}) {
   log('Sorting');
   convertPriceToInt(list: list);
   CombineHelper().mergeSort(list, 0, list.length - 1);

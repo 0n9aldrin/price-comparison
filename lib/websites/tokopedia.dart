@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pricecomparison/main.dart';
 import '../Item.dart';
-import '../image_model.dart';
+import '../product.dart';
 import 'dart:developer';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'dart:io';
@@ -27,35 +27,35 @@ class Tokopedia {
     } on NoSuchMethodError {}
   }
 
-  Future<List<ImageModel>> getTokopedia({String searches, int page}) async {
+  Future<List<Product>> getTokopedia({String searches, int page}) async {
     try {
       search = searches;
       search = search.replaceAll(' ', '%20');
 
       var json = await getJson(pages: page);
-      List<ImageModel> items = getData(json: json);
+      List<Product> items = getData(json: json);
 
       return items;
     } on NoSuchMethodError {}
   }
 
-  Future<List<ImageModel>> getAds({String searches}) async {
+  Future<List<Product>> getAds({String searches}) async {
     search = searches;
     String searchSpecial = search;
     search = search.replaceAll(' ', '%20');
 
     var json = await getAdsJson(searchSpecial: searchSpecial);
-    List<ImageModel> items = getAdData(json: json);
+    List<Product> items = getAdData(json: json);
 
     return items;
   }
 
-  List<ImageModel> getAdData({var json}) {
-    List<ImageModel> items = [];
+  List<Product> getAdData({var json}) {
+    List<Product> items = [];
 
     if (topAdsLength != 0) {
       for (int x = 0; x < topAdsLength; x++) {
-        ImageModel imageModel = ImageModel();
+        Product imageModel = Product();
         String tempPrice =
             json[1]['data']['displayAdsV3']['data'][x]['product']['price'];
         tempPrice = tempPrice.replaceAll('.', '');
@@ -86,12 +86,12 @@ class Tokopedia {
     return items;
   }
 
-  List<ImageModel> getData({var json}) {
-    List<ImageModel> items = [];
+  List<Product> getData({var json}) {
+    List<Product> items = [];
 
     searchLength = json[0]['data']['searchProduct']['products'].length;
     for (int x = 0; x < searchLength; x++) {
-      ImageModel imageModel = ImageModel();
+      Product imageModel = Product();
       String tempPrice =
           json[0]['data']['searchProduct']['products'][x]['price'];
       tempPrice = tempPrice.replaceAll('.', '');
@@ -378,7 +378,7 @@ class _TokopediaGridViewState extends State<TokopediaGridView>
         if (tokopediaItems != null) {
           await Future.delayed(Duration(milliseconds: 1000));
           tokopediaCounter++;
-          List<ImageModel> tempList = await tokopedia.getTokopedia(
+          List<Product> tempList = await tokopedia.getTokopedia(
               searches: globalSearch, page: (tokopediaCounter - 1));
           for (int x = 0; x < tempList.length; x++) {
             tokopediaItems.add(tempList[x]);

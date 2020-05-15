@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../image_model.dart';
+import '../product.dart';
 import 'dart:developer';
 import 'package:pricecomparison/main.dart';
 import 'dart:io';
@@ -38,22 +38,22 @@ class Blibli {
     } on NoSuchMethodError {}
   }
 
-  Future<List<ImageModel>> getBlibli({String searches, int page}) async {
+  Future<List<Product>> getBlibli({String searches, int page}) async {
     try {
       search = searches;
       search = search.replaceAll(' ', '%20');
 
       json = await getJson(page: page);
-      List<ImageModel> items = getData(json: json);
+      List<Product> items = getData(json: json);
 
       return items;
     } on NoSuchMethodError {}
   }
 
-  List<ImageModel> getData({var json}) {
-    List<ImageModel> items = [];
+  List<Product> getData({var json}) {
+    List<Product> items = [];
     for (int x = 0; x < searchLength; x++) {
-      ImageModel imageModel = ImageModel();
+      Product imageModel = Product();
 
       String tempPrice =
           json['data']['products'][x]['price']['minPrice'].toStringAsFixed(0);
@@ -200,7 +200,7 @@ class BlibliGridViewState extends State<BlibliGridView>
         if (blibliItems != null) {
           await Future.delayed(Duration(milliseconds: 1000));
           blibliCounter++;
-          List<ImageModel> tempList = await widget.blibli
+          List<Product> tempList = await widget.blibli
               .getBlibli(page: blibliCounter, searches: globalSearch);
           for (int x = 0; x < tempList.length; x++) {
             blibliItems.add(tempList[x]);
