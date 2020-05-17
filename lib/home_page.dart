@@ -124,84 +124,321 @@ class _MyHomePageState extends State<MyHomePage>
     if (Platform.isIOS) {
       return Theme(
         data: ThemeData.light(),
-        child: SafeArea(
-          child: Scaffold(
-            appBar: CupertinoNavigationBar(
-              middle: Row(
-                children: <Widget>[
-                  GestureDetector(
-                    child: _searchIcon,
-                    onTap: () {
-                      setState(() {
-                        _searchIcon = Container();
-                        myFocusNode.requestFocus();
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      textInputAction: TextInputAction.search,
-                      focusNode: myFocusNode,
-                      onSubmitted: (value) {
+        child: DefaultTabController(
+          length: 6,
+          child: SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                title: Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      child: _searchIcon,
+                      onTap: () {
                         setState(() {
-                          _searchIcon = Platform.isIOS
-                              ? Icon(
-                                  CupertinoIcons.search,
-                                  color: CupertinoColors.activeBlue,
-                                )
-                              : Icon(
-                                  Icons.search,
-                                  color: Colors.white,
-                                );
-                          globalSearch = value;
-                          log('submit: $globalSearch');
+                          _searchIcon = Container();
+                          myFocusNode.requestFocus();
                         });
                       },
-                      decoration: new InputDecoration(hintText: 'Search...'),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: CupertinoTextField(
+                        textInputAction: TextInputAction.search,
+                        focusNode: myFocusNode,
+                        onSubmitted: (value) {
+                          setState(() {
+                            _searchIcon = Platform.isIOS
+                                ? Icon(
+                                    CupertinoIcons.search,
+                                    color: CupertinoColors.activeBlue,
+                                  )
+                                : Icon(
+                                    Icons.search,
+                                    color: Colors.white,
+                                  );
+                            globalSearch = value;
+                            log('submit: $globalSearch');
+                          });
+                        },
+                        placeholder: "Search...",
+                      ),
+                    ),
+                  ],
+                ),
+                actions: <Widget>[
+                  IconButton(
+                      icon: Icon(
+                        CupertinoIcons.photo_camera_solid,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                      onPressed: () async {
+                        try {
+                          var file = await ImagePicker.pickImage(
+                              source: ImageSource.gallery);
+                          if (file != null) {
+                            setState(() {
+                              _file = file;
+                            });
+                          }
+                        } catch (e) {
+                          print(e);
+                        }
+                      })
+                ],
+                bottom: TabBar(
+                  indicatorColor: CupertinoColors.activeBlue,
+                  labelColor: CupertinoColors.activeBlue,
+                  tabs: [
+                    Tab(
+                      text: 'Tokopedia',
+                    ),
+                    Tab(
+                      text: 'Ebay',
+                    ),
+                    Tab(
+                      text: 'Blibli',
+                    ),
+                    Tab(
+                      text: 'Bukalapak',
+                    ),
+                    Tab(
+                      text: 'Shopee',
+                    ),
+                    Tab(
+                      text: 'Combined',
+                    ),
+                  ],
+                  isScrollable: true,
+                ),
+              ),
+              body: TabBarView(
+                children: <Widget>[
+                  Scrollbar(
+                    child: Stack(
+                      children: <Widget>[
+                        Column(
+                          children: <Widget>[
+                            Expanded(
+                              child: TokopediaGridView(),
+                            ),
+                            FutureBuilder(
+                              builder: (context, snapshot) {
+                                return Container(
+                                  color: Colors.grey,
+                                  height: 28.0,
+                                  padding: EdgeInsets.only(left: 20.0),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child:
+                                        Text('Total results: ${snapshot.data}'),
+                                  ),
+                                );
+                              },
+                              future:
+                                  tokopedia.getTotal(searches: globalSearch),
+                            ),
+                          ],
+                        ),
+                        Positioned(
+                          bottom: 40,
+                          right: 15,
+                          child: FancyFab(
+                            onPressedPrice: () {
+                              sortDataByPrice(list: tokopediaItems);
+                              tokopediaSorted = true;
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  Scrollbar(
+                      child: Stack(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: EbayGridView(
+                              ebay: ebay,
+                            ),
+                          ),
+                          totalWidget(
+                            future: ebay.getTotal1(
+                                searches: globalSearch, page: ebayCounter),
+                          )
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 40,
+                        right: 15,
+                        child: FancyFab(
+                          onPressedPrice: () {
+                            sortDataByPrice(list: ebayItems);
+                            ebaySorted = true;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Scrollbar(
+                      child: Stack(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: BlibliGridView(
+                              blibli: blibli,
+                            ),
+                          ),
+                          FutureBuilder(
+                            builder: (context, snapshot) {
+                              return Container(
+                                color: Colors.grey,
+                                height: 28.0,
+                                padding: EdgeInsets.only(left: 20.0),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                        'Total results: ${snapshot.data}')),
+                              );
+                            },
+                            future: blibli.getTotal1(
+                                searches: globalSearch, page: blibliCounter),
+                          )
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 40,
+                        right: 15,
+                        child: FancyFab(
+                          onPressedPrice: () {
+                            sortDataByPrice(list: blibliItems);
+                            blibliSorted = true;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Scrollbar(
+                      child: Stack(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: BukalapakGridView(
+                              bukalapak: bukalapak,
+                            ),
+                          ),
+                          FutureBuilder(
+                            builder: (context, snapshot) {
+                              return Container(
+                                color: Colors.grey,
+                                height: 28.0,
+                                padding: EdgeInsets.only(left: 20.0),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                        'Total results: ${snapshot.data}')),
+                              );
+                            },
+                            future: bukalapak.getTotal1(
+                                searches: globalSearch, page: bukalapakCounter),
+                          )
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 40,
+                        right: 15,
+                        child: FancyFab(
+                          onPressedPrice: () {
+                            sortDataByPrice(list: bukalapakItems);
+                            bukalapakSorted = true;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Scrollbar(
+                      child: Stack(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: ShopeeGridView(
+                              shopee: shopee,
+                            ),
+                          ),
+                          FutureBuilder(
+                            builder: (context, snapshot) {
+                              return Container(
+                                color: Colors.grey,
+                                height: 28.0,
+                                padding: EdgeInsets.only(left: 20.0),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                        'Total results: ${snapshot.data}')),
+                              );
+                            },
+                            future: shopee.getTotal1(
+                                searches: globalSearch, page: shopeeCounter),
+                          )
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 40,
+                        right: 15,
+                        child: FancyFab(
+                          onPressedPrice: () {
+                            sortDataByPrice(list: shopeeItems);
+                            shopeeSorted = true;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Scrollbar(
+                      child: Stack(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: CombinedGridView(),
+                          ),
+                          FutureBuilder(
+                            builder: (context, snapshot) {
+                              return Container(
+                                color: Colors.grey,
+                                height: 28.0,
+                                padding: EdgeInsets.only(left: 20.0),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                        'Total results: ${snapshot.data}')),
+                              );
+                            },
+                            future: combineHelper.combineTotal(
+                                search: globalSearch),
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 40,
+                        right: 15,
+                        child: FancyFab(),
+                      ),
+                    ],
+                  )),
                 ],
               ),
-              trailing: Icon(
-                CupertinoIcons.photo_camera_solid,
-                color: Colors.blue,
-              ),
-            ),
-            body: Column(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: CupertinoSlidingSegmentedControl(
-                      thumbColor: CupertinoColors.activeBlue,
-                      groupValue: segmentedControlGroupValue,
-                      children: myTabs,
-                      onValueChanged: (i) {
-                        setState(() {
-                          segmentedControlGroupValue = i;
-                        });
-                      }),
-                ),
-                Expanded(
-                  child: whichGrid(),
-                ),
-                FutureBuilder(
-                  builder: (context, snapshot) {
-                    return Container(
-                      color: CupertinoColors.inactiveGray,
-                      height: 28.0,
-                      padding: EdgeInsets.only(left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text('Total results: ${snapshot.data}'),
-                      ),
-                    );
-                  },
-                  future: whichTotal(),
-                ),
-              ],
             ),
           ),
         ),
