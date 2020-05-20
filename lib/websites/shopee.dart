@@ -61,7 +61,7 @@ class Shopee {
       imageModel.url = json[x]['url'];
       imageModel.img = json[x]['image_url'];
       imageModel.website = 'Shopee';
-      imageModel.rating = json[x]['rating'].round();
+      imageModel.rating = json[x]['rating'].toDouble();
       var reviewCount = 0;
       if (imageModel.rating != 0) {
         reviewCount = json[x]['review_count'];

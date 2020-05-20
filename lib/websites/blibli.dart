@@ -64,6 +64,9 @@ class Blibli {
       imageModel.url =
           'https://www.blibli.com' + json['data']['products'][x]['url'];
       imageModel.img = json['data']['products'][x]['images'][0];
+      imageModel.rating =
+          json['data']['products'][x]['review']['rating'].toDouble();
+      imageModel.reviews = json['data']['products'][x]['review']['count'];
       imageModel.website = 'Blibli';
 
       items.add(imageModel);
@@ -147,8 +150,8 @@ class BlibliGridViewState extends State<BlibliGridView>
         url: blibliItems[i].url,
         image: blibliItems[i].img,
         price: blibliItems[i].price,
-        reviews: 12,
-        rating: 4,
+        reviews: blibliItems[i].reviews,
+        rating: blibliItems[i].rating,
       ),
       itemCount: blibliItems.length,
     );

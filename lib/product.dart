@@ -5,7 +5,7 @@ class Product {
   String img;
   String website;
   List images;
-  int rating;
+  double rating;
   int reviews;
 
   List<Product> removeDuplicates({List<Product> data}) {

@@ -7,6 +7,7 @@ import '../product.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:pricecomparison/main.dart';
+import 'dart:developer';
 
 class Ebay {
   String search;
@@ -65,6 +66,17 @@ class Ebay {
           'div > div.s-item__info.clearfix > div.s-item__details.clearfix > div > span.s-item__price');
       var imgElement = a[x].querySelector(
           'div > div.s-item__image-section > div > a > div > img');
+      var reviewElement = a[x].querySelector(
+          'div > div.s-item__info.clearfix > div.s-item__reviews');
+      if (reviewElement == null) {
+        imageModel.rating = 0;
+        imageModel.reviews = 0;
+      } else {
+        List tempList = reviewElement.text.split(' ');
+        imageModel.rating = double.parse(tempList[0]);
+        tempList[4] = tempList[4].replaceAll('stars.', '');
+        imageModel.reviews = int.parse(tempList[4]);
+      }
       dynamic tempPrice = priceElement.text;
       tempPrice = tempPrice.replaceAll(',', '');
       tempPrice = tempPrice.replaceAll('IDR', '');
@@ -183,8 +195,8 @@ class _EbayGridViewState extends State<EbayGridView>
         url: ebayItems[i].url,
         image: ebayItems[i].img,
         price: ebayItems[i].price,
-        reviews: 12,
-        rating: 4,
+        reviews: ebayItems[i].reviews,
+        rating: ebayItems[i].rating,
       ),
       itemCount: ebayItems.length,
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animations/animations.dart';
+import 'rating.dart';
 
 class Item extends StatefulWidget {
   final String title;
@@ -8,7 +9,7 @@ class Item extends StatefulWidget {
   final dynamic price;
   final String image;
   final String website;
-  final int rating;
+  final double rating;
   final int reviews;
 
   Item(
@@ -27,29 +28,7 @@ class Item extends StatefulWidget {
 class _ItemState extends State<Item> {
   @override
   Widget build(BuildContext context) {
-    List<Widget> stars = [];
-    for (int x = 0; x < widget.rating; x++) {
-      stars.add(
-        Icon(
-          Icons.star,
-          size: 12,
-        ),
-      );
-    }
-    for (int x = 0; x < (5 - widget.rating); x++) {
-      stars.add(
-        Icon(
-          Icons.star_border,
-          size: 12,
-        ),
-      );
-    }
-    stars.add(
-      Text(
-        ' (${widget.reviews})',
-        style: TextStyle(fontSize: 10),
-      ),
-    );
+    List<Widget> stars = Rating(ratingNumber: widget.rating).getRating();
 
     if (widget.website != null) {
       return OpenContainerWrapper(
@@ -128,7 +107,7 @@ class WebCard extends StatelessWidget {
   final dynamic price;
   final String image;
   final String website;
-  final int rating;
+  final double rating;
   final int reviews;
   final List<Widget> stars;
 
@@ -183,9 +162,19 @@ class WebCard extends StatelessWidget {
             ),
             SizedBox(height: 2.0),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.only(left: 8.0),
               child: Row(
-                children: stars,
+                children: <Widget>[
+                  Row(
+                    children: stars,
+                  ),
+                  Text(
+                    '($reviews)',
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 8.0),
@@ -215,7 +204,7 @@ class CombinedCard extends StatelessWidget {
   final dynamic price;
   final String image;
   final String website;
-  final int rating;
+  final double rating;
   final int reviews;
   final List<Widget> stars;
 
@@ -336,7 +325,7 @@ class _DetailsPage extends StatelessWidget {
   final dynamic price;
   final String image;
   final String website;
-  final int rating;
+  final double rating;
   final int reviews;
   @override
   Widget build(BuildContext context) {
@@ -375,7 +364,7 @@ class _DetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '$rating/5',
+                  '${rating.toStringAsFixed(1)}/5',
                   style: TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,
@@ -426,7 +415,7 @@ class OpenContainerWrapper extends StatelessWidget {
   final dynamic price;
   final String image;
   final String website;
-  final int rating;
+  final double rating;
   final int reviews;
 
   @override

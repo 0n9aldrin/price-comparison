@@ -71,9 +71,10 @@ class Tokopedia {
         imageModel.img = json[1]['data']['displayAdsV3']['data'][x]['product']
             ['image']['imageUrl'];
         imageModel.website = 'Tokopedia';
-        imageModel.rating = json[1]['data']['displayAdsV3']['data'][x]
-                ['product']['rating'] ~/
-            20;
+        imageModel.rating = (json[1]['data']['displayAdsV3']['data'][x]
+                    ['product']['rating'] ~/
+                20)
+            .toDouble();
         String tempReview = json[1]['data']['displayAdsV3']['data'][x]
             ['product']['countReviewFormat'];
         tempReview = tempReview.replaceAll('.', '');
@@ -106,7 +107,7 @@ class Tokopedia {
           json[0]['data']['searchProduct']['products'][x]['imageURL'];
       imageModel.website = 'Tokopedia';
       imageModel.rating =
-          json[0]['data']['searchProduct']['products'][x]['rating'];
+          json[0]['data']['searchProduct']['products'][x]['rating'].toDouble();
       imageModel.reviews =
           json[0]['data']['searchProduct']['products'][x]['countReview'];
       items.add(imageModel);
