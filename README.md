@@ -1,5 +1,5 @@
- # pricecomparison
+ # Price Comparison App
 
-A new Flutter application.
+This Flutter app compares the prices of 5 Indonesian e-commerce websites.
 
 ![](app.gif)
