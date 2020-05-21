@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animations/animations.dart';
 import 'rating.dart';
+import 'details_page.dart';
 
 class Item extends StatefulWidget {
   final String title;
@@ -311,91 +312,6 @@ class _InkWellOverlay extends StatelessWidget {
   }
 }
 
-class _DetailsPage extends StatelessWidget {
-  _DetailsPage(
-      {this.title,
-      this.url,
-      this.price,
-      this.image,
-      this.website,
-      this.rating,
-      this.reviews});
-  final String title;
-  final String url;
-  final dynamic price;
-  final String image;
-  final String website;
-  final double rating;
-  final int reviews;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Details page')),
-      body: ListView(
-        children: <Widget>[
-          Container(
-            color: Colors.black38,
-            height: 300,
-            child: Image(
-              image: NetworkImage(image),
-              fit: BoxFit.fill,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'RP $price',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.deepOrange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  '${rating.toStringAsFixed(1)}/5',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () async {
-                    if (await canLaunch(url)) {
-                      await launch(url);
-                    }
-                  },
-                  child: Text(
-                    'Go to website',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class OpenContainerWrapper extends StatelessWidget {
   const OpenContainerWrapper(
       {this.closedBuilder,
@@ -423,7 +339,7 @@ class OpenContainerWrapper extends StatelessWidget {
     return OpenContainer(
       transitionType: transitionType,
       openBuilder: (BuildContext context, VoidCallback _) {
-        return _DetailsPage(
+        return DetailsPage(
           title: title,
           image: image,
           url: url,
