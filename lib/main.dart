@@ -3,6 +3,7 @@ import 'package:pricecomparison/product.dart';
 import 'dart:developer';
 import 'combined.dart';
 import 'package:flutter/cupertino.dart';
+import 'const.dart';
 import 'home_page.dart';
 
 void main() => runApp(MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(),
+      theme: ThemeData.light(),
       home: MyHomePage(),
     );
   }
@@ -71,3 +72,5 @@ void sortDataByPrice({List<Product> list}) {
   log('Sorted');
   convertPriceToString(list: list);
 }
+
+Color appBarColor = tokopediaColor;

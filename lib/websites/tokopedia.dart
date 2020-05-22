@@ -70,6 +70,7 @@ class Tokopedia {
             json[1]['data']['displayAdsV3']['data'][x]['product']['url'];
         imageModel.img = json[1]['data']['displayAdsV3']['data'][x]['product']
             ['image']['imageUrl'];
+        imageModel.img = imageModel.img.replaceAll('200-square', '700');
         imageModel.website = 'Tokopedia';
         imageModel.rating = (json[1]['data']['displayAdsV3']['data'][x]
                     ['product']['rating'] ~/
@@ -105,6 +106,7 @@ class Tokopedia {
       imageModel.url = json[0]['data']['searchProduct']['products'][x]['url'];
       imageModel.img =
           json[0]['data']['searchProduct']['products'][x]['imageURL'];
+      imageModel.img = imageModel.img.replaceAll('200-square', '700');
       imageModel.website = 'Tokopedia';
       imageModel.rating =
           json[0]['data']['searchProduct']['products'][x]['rating'].toDouble();

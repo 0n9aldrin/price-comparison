@@ -1,6 +1,6 @@
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:animations/animations.dart';
 import 'const.dart';
 import 'rating.dart';
@@ -118,15 +118,16 @@ class WebCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('$website');
     return _InkWellOverlay(
-      height: 225,
+      height: 400,
       width: 100,
       openContainer: openContainer,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: colors[website]),
-//          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colors[website],
+          ),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -135,7 +136,10 @@ class WebCard extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20)),
+                  color: Colors.white,
                   image: DecorationImage(
                       image: NetworkImage(image), fit: BoxFit.fill),
                 ),
@@ -301,16 +305,18 @@ class _InkWellOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: height,
       width: width,
-      child: Theme(
-        data: ThemeData.dark(),
-        child: Material(
-          child: InkWell(
-            onTap: openContainer,
-            child: child,
-          ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Material(
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: openContainer,
+          child: child,
         ),
       ),
     );
@@ -342,6 +348,9 @@ class OpenContainerWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
+      closedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       transitionType: transitionType,
       openBuilder: (BuildContext context, VoidCallback _) {
         return DetailsPage(

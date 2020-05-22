@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'const.dart';
 
-class DetailsPage2 extends StatelessWidget {
-  DetailsPage2(
+class DetailsPage1 extends StatelessWidget {
+  DetailsPage1(
       {this.title,
       this.url,
       this.price,
@@ -46,12 +46,9 @@ class DetailsPage2 extends StatelessWidget {
             margin: EdgeInsets.only(top: 20),
             child: Align(
               alignment: Alignment.topCenter,
-              child: Hero(
-                tag: 1,
-                child: Image(
-                  image: NetworkImage(image),
-                  fit: BoxFit.fill,
-                ),
+              child: Image(
+                image: NetworkImage(image),
+                fit: BoxFit.fill,
               ),
             ),
           ),
@@ -65,7 +62,7 @@ class DetailsPage2 extends StatelessWidget {
                   IconButton(
                       icon: Icon(
                         Icons.arrow_back_ios,
-                        color: Colors.black,
+                        color: colors[website],
                       ),
                       onPressed: () {
                         Navigator.pop(context);
@@ -73,7 +70,7 @@ class DetailsPage2 extends StatelessWidget {
                   IconButton(
                       icon: Icon(
                         Icons.share,
-                        color: Colors.black,
+                        color: colors[website],
                       ),
                       onPressed: () {})
                 ],
@@ -110,7 +107,7 @@ class DetailsPage2 extends StatelessWidget {
                     height: 60,
                     width: 70,
                     decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: colors[website],
                         borderRadius: BorderRadius.circular(20)),
                     child: Icon(
                       Icons.favorite_border,
@@ -130,7 +127,7 @@ class DetailsPage2 extends StatelessWidget {
                       child: Container(
                         height: 60,
                         decoration: BoxDecoration(
-                            color: Colors.green,
+                            color: colors[website],
                             borderRadius: BorderRadius.circular(20)),
                         child: Center(
                             child: Text(
