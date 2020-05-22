@@ -330,6 +330,8 @@ class _TokopediaGridViewState extends State<TokopediaGridView>
         price: tokopediaItems[i].price,
         reviews: tokopediaItems[i].reviews,
         rating: tokopediaItems[i].rating,
+        website: tokopediaItems[i].website,
+        combined: false,
       ),
       itemCount: tokopediaItems.length,
     );

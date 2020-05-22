@@ -206,6 +206,7 @@ class _CombinedGridViewState extends State<CombinedGridView>
         image: data[i].img,
         price: data[i].price,
         website: data[i].website,
+        combined: true,
         rating: 5,
         reviews: 23,
       ),

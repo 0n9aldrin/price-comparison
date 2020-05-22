@@ -164,6 +164,8 @@ class _BukalapakGridViewState extends State<BukalapakGridView>
         url: bukalapakItems[i].url,
         image: bukalapakItems[i].img,
         price: bukalapakItems[i].price,
+        website: bukalapakItems[i].website,
+        combined: false,
         reviews: 12,
         rating: 4,
       ),

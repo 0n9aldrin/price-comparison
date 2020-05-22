@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animations/animations.dart';
+import 'const.dart';
 import 'rating.dart';
 import 'details_page.dart';
 
@@ -12,6 +14,7 @@ class Item extends StatefulWidget {
   final String website;
   final double rating;
   final int reviews;
+  final bool combined;
 
   Item(
       {this.title,
@@ -20,7 +23,8 @@ class Item extends StatefulWidget {
       this.image,
       this.website,
       this.rating,
-      this.reviews});
+      this.reviews,
+      this.combined});
 
   @override
   _ItemState createState() => _ItemState();
@@ -31,7 +35,7 @@ class _ItemState extends State<Item> {
   Widget build(BuildContext context) {
     List<Widget> stars = Rating(ratingNumber: widget.rating).getRating();
 
-    if (widget.website != null) {
+    if (widget.combined == true) {
       return OpenContainerWrapper(
         transitionType: ContainerTransitionType.fade,
         title: widget.title,
@@ -114,13 +118,14 @@ class WebCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('$website');
     return _InkWellOverlay(
       height: 225,
       width: 100,
       openContainer: openContainer,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[600]),
+          border: Border.all(color: colors[website]),
 //          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(

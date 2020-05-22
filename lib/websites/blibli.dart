@@ -152,6 +152,8 @@ class BlibliGridViewState extends State<BlibliGridView>
         price: blibliItems[i].price,
         reviews: blibliItems[i].reviews,
         rating: blibliItems[i].rating,
+        website: blibliItems[i].website,
+        combined: false,
       ),
       itemCount: blibliItems.length,
     );

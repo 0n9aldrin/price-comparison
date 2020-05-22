@@ -146,6 +146,8 @@ class ShopeeGridViewState extends State<ShopeeGridView>
         price: shopeeItems[i].price,
         reviews: shopeeItems[i].reviews,
         rating: shopeeItems[i].rating,
+        website: shopeeItems[i].website,
+        combined: false,
       ),
       itemCount: shopeeItems.length,
     );

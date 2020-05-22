@@ -197,6 +197,8 @@ class _EbayGridViewState extends State<EbayGridView>
         price: ebayItems[i].price,
         reviews: ebayItems[i].reviews,
         rating: ebayItems[i].rating,
+        website: ebayItems[i].website,
+        combined: false,
       ),
       itemCount: ebayItems.length,
     );
