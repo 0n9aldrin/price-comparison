@@ -64,6 +64,7 @@ class Blibli {
       imageModel.url =
           'https://www.blibli.com' + json['data']['products'][x]['url'];
       imageModel.img = json['data']['products'][x]['images'][0];
+      imageModel.img = imageModel.img.replaceAll('medium', 'full');
       imageModel.rating =
           json['data']['products'][x]['review']['rating'].toDouble();
       imageModel.reviews = json['data']['products'][x]['review']['count'];

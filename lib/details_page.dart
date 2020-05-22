@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'const.dart';
 
-class DetailsPage1 extends StatelessWidget {
-  DetailsPage1(
+class DetailsPage extends StatelessWidget {
+  DetailsPage(
       {this.title,
       this.url,
       this.price,
@@ -153,8 +153,8 @@ class DetailsPage1 extends StatelessWidget {
   }
 }
 
-class DetailsPage extends StatelessWidget {
-  DetailsPage(
+class DetailsPage1 extends StatelessWidget {
+  DetailsPage1(
       {this.title,
       this.url,
       this.price,

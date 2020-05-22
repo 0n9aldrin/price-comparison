@@ -77,6 +77,7 @@ class Bukalapak {
           new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
       imageModel.price = tempPrice;
       imageModel.img = imgElement.attributes['data-src'];
+      imageModel.img = imageModel.img.replaceAll('s-194-194', 'w-1000');
       imageModel.website = 'Bukalapak';
 
       if (imageModel.img.contains('jpg') ||

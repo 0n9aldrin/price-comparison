@@ -91,6 +91,9 @@ class Ebay {
       imageModel.url = nameElement.attributes['href'];
       imageModel.price = tempPrice;
       imageModel.img = imgElement.attributes['src'];
+      imageModel.img = imageModel.img.replaceAll('thumbs/', '');
+      imageModel.img = imageModel.img.replaceAll('225', '500');
+      imageModel.img = imageModel.img.replaceAll('webp', 'png');
       imageModel.website = "Ebay";
       items.add(imageModel);
     }
