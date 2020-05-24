@@ -133,6 +133,7 @@ class Ebay {
 
     var res = await http.get('https://www.ebay.com/sch/i.html?$query',
         headers: headers);
+    log('Ebay http called');
     if (res.statusCode != 200)
       throw Exception('Ebay error: statusCode= ${res.statusCode}');
     var data = res.body;

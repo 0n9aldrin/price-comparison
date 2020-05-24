@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'const.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
+import 'websites/blibli.dart';
 
 class DetailsPage extends StatelessWidget {
   DetailsPage(
@@ -23,6 +26,7 @@ class DetailsPage extends StatelessWidget {
     List<BoxShadow> shadowList = [
       BoxShadow(color: Colors.grey[300], blurRadius: 30, offset: Offset(0, 10))
     ];
+    Blibli blibli = Blibli();
 
     return Scaffold(
       body: Stack(
@@ -32,7 +36,7 @@ class DetailsPage extends StatelessWidget {
             children: [
               Expanded(
                 child: Container(
-                  color: Colors.blueGrey[300],
+                  color: Colors.white,
                 ),
               ),
               Expanded(
@@ -92,6 +96,47 @@ class DetailsPage extends StatelessWidget {
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 500,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SingleChildScrollView(
+              child: Container(
+                width: double.infinity,
+                height: 500,
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Text('Price: RP$price'),
+                    FutureBuilder(
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return Text(snapshot.data);
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      },
+                      future: blibli.getDescription(),
+                    ),
+                    FutureBuilder(
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return Text(snapshot.data);
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      },
+                      future: blibli.getDescription(),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -76,6 +76,14 @@ class Blibli {
     return items;
   }
 
+  Future<dynamic> getDescription() async {
+    var res = await http.get(
+        'https://www.blibli.com/backend/product/products/pc--MTA-3414952/_summary?selectedItemSku=TOD-60083-00010-00001');
+    log('Blibli http called');
+    dynamic json = jsonDecode(res.body);
+    return json['data']['description'];
+  }
+
   Future<dynamic> getJson({int page}) async {
     int start = page * 32;
     http.Response response = await http.get(

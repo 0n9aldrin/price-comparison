@@ -148,6 +148,7 @@ class Tokopedia {
 
     var res = await http.post('https://gql.tokopedia.com/',
         headers: headers, body: data);
+    log('TokAds http called');
     if (res.statusCode != 200)
       throw Exception('http.post error: statusCode= ${res.statusCode}');
 
@@ -256,6 +257,7 @@ class Tokopedia {
 
     var res = await http.post('https://gql.tokopedia.com/',
         headers: headers, body: data);
+    log('Tok http called');
     if (res.statusCode != 200)
       throw Exception('http.post error: statusCode= ${res.statusCode}');
 

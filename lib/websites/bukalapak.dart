@@ -97,7 +97,7 @@ class Bukalapak {
   Future<dynamic> getHtml({int page}) async {
     http.Response response = await http.get(
         'https://www.bukalapak.com/products/s?from=omnisearch&from_keyword_history=false&page=$page&search%5Bkeywords%5D=$search&search_source=omnisearch_organic&source=navbar&utf8=✓');
-
+    log('Bukalapak http called');
     if (response.statusCode == 200) {
       String data = response.body;
       return data;

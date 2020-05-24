@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pricecomparison/fancy_fab.dart';
 import 'package:pricecomparison/websites/lazada.dart';
 import 'package:pricecomparison/websites/shopee.dart';
+import 'package:provider/provider.dart';
 import 'const.dart';
-import 'const.dart';
-import 'main.dart';
 import 'main.dart';
 import 'websites/blibli.dart';
 import 'websites/tokopedia.dart';
@@ -17,6 +16,27 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 import 'dart:io';
 import 'main.dart';
+
+class ColorChange extends ChangeNotifier {
+  Color getColor(int index) {
+    return colors[index];
+  }
+
+  void changeColor(int index) {
+    Color color = colors[index];
+    print(color);
+    notifyListeners();
+  }
+}
+
+List<Color> colors = const [
+  tokopediaColor,
+  ebayColor,
+  blibliColor,
+  bukalapakColor,
+  shopeeColor,
+  Colors.deepPurple,
+];
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -34,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage>
   Shopee shopee = Shopee();
   File _file;
   FocusNode myFocusNode;
+  TabController controller;
 
   Widget _searchIcon = Platform.isIOS
       ? Icon(
@@ -49,7 +70,14 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     super.initState();
     myFocusNode = FocusNode();
+    controller = TabController(length: colors.length, vsync: this);
   }
+
+//  void _select() {
+//    setState(() {
+//      selectedTab = tabs[controller.index];
+//    });
+//  }
 
   @override
   void dispose() {
@@ -61,8 +89,8 @@ class _MyHomePageState extends State<MyHomePage>
   int segmentedControlGroupValue = 0;
   final Map<int, Widget> myTabs = const <int, Widget>{
     0: Text("Tokopedia"),
-    1: Text("Blibli"),
-    2: Text("Ebay"),
+    1: Text("Ebay"),
+    2: Text("Blibli"),
     3: Text("Bukalapak"),
     4: Text("Shopee"),
     5: Text("Combined"),
@@ -453,6 +481,8 @@ class _MyHomePageState extends State<MyHomePage>
         child: SafeArea(
           child: Scaffold(
             appBar: AppBar(
+              backgroundColor:
+                  Provider.of<ColorChange>(context).getColor(controller.index),
               title: Row(
                 children: <Widget>[
                   GestureDetector(
@@ -469,6 +499,7 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
                   Expanded(
                     child: TextField(
+                      style: TextStyle(color: Colors.white),
                       textInputAction: TextInputAction.search,
                       focusNode: myFocusNode,
                       onSubmitted: (value) {
@@ -486,7 +517,9 @@ class _MyHomePageState extends State<MyHomePage>
                           log('submit: $globalSearch');
                         });
                       },
-                      decoration: new InputDecoration(hintText: 'Search...'),
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                      ),
                     ),
                   ),
                 ],
@@ -512,6 +545,11 @@ class _MyHomePageState extends State<MyHomePage>
                     })
               ],
               bottom: TabBar(
+                onTap: (index) {
+                  Provider.of<ColorChange>(context, listen: false)
+                      .changeColor(index);
+                },
+                controller: controller,
                 tabs: [
                   Tab(
                     text: 'Tokopedia',
@@ -536,6 +574,7 @@ class _MyHomePageState extends State<MyHomePage>
               ),
             ),
             body: TabBarView(
+              controller: controller,
               children: <Widget>[
                 Scrollbar(
                   child: Stack(

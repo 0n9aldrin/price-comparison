@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pricecomparison/product.dart';
+import 'package:pricecomparison/simple_tab.dart';
+import 'package:provider/provider.dart';
 import 'dart:developer';
 import 'combined.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,9 +13,12 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-      home: MyHomePage(),
+    return ChangeNotifierProvider(
+      create: (context) => ColorsChange(),
+      child: MaterialApp(
+        theme: ThemeData.light(),
+        home: SimpleTab(),
+      ),
     );
   }
 }
@@ -72,5 +77,3 @@ void sortDataByPrice({List<Product> list}) {
   log('Sorted');
   convertPriceToString(list: list);
 }
-
-Color appBarColor = tokopediaColor;

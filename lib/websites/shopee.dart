@@ -75,6 +75,7 @@ class Shopee {
   Future<dynamic> getJson({int page}) async {
     var res = await http.get(
         'https://price-web-scraper.herokuapp.com/api/?keyword=$search&page=$page');
+    log('Shopee http called');
     if (res.statusCode == 200) {
       String data = res.body;
       dynamic json = jsonDecode(data);
