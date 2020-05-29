@@ -73,6 +73,7 @@ class _FancyFabState extends State<FancyFab>
   Widget search() {
     return Container(
       child: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: null,
         tooltip: 'Search',
         label: Text('Search'),
@@ -84,6 +85,7 @@ class _FancyFabState extends State<FancyFab>
   Widget image() {
     return Container(
       child: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: widget.onPressedPrice,
         tooltip: 'Price',
         label: Text('Price'),
@@ -95,6 +97,7 @@ class _FancyFabState extends State<FancyFab>
   Widget inbox() {
     return Container(
       child: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: null,
         tooltip: 'Rating',
         label: Text('Rating'),
@@ -106,6 +109,7 @@ class _FancyFabState extends State<FancyFab>
   Widget toggle() {
     return Container(
       child: FloatingActionButton.extended(
+        heroTag: null,
         backgroundColor: _buttonColor.value,
         onPressed: animate,
         tooltip: 'Toggle',

@@ -125,9 +125,11 @@ class CombineHelper {
   Future<int> combineTotal({var search}) async {
     try {
       dynamic tokopediaTotal = await tokopedia.getTotal(searches: search);
-      dynamic ebayTotal = await ebay.getTotal(searches: search);
-      dynamic bukalapakTotal = await bukalapak.getTotal(searches: search);
-      dynamic blibliTotal = await blibli.getTotal(searches: search);
+      dynamic ebayTotal = await ebay.getTotal1(searches: search, page: 1);
+      dynamic bukalapakTotal =
+          await bukalapak.getTotal1(searches: search, page: 1);
+      dynamic blibliTotal = await blibli.getTotal1(searches: search, page: 1);
+      dynamic shopeeTotal = await shopee.getTotal1(searches: search, page: 1);
 
       tokopediaTotal = tokopediaTotal.replaceAll(',', '');
       tokopediaTotal = int.parse(tokopediaTotal);
@@ -137,8 +139,14 @@ class CombineHelper {
       bukalapakTotal = int.parse(bukalapakTotal);
       blibliTotal = blibliTotal.replaceAll(',', '');
       blibliTotal = int.parse(blibliTotal);
+      shopeeTotal = shopeeTotal.replaceAll(',', '');
+      shopeeTotal = int.parse(shopeeTotal);
 
-      combinedTotal = tokopediaTotal + ebayTotal + bukalapakTotal + blibliTotal;
+      combinedTotal = tokopediaTotal +
+          ebayTotal +
+          bukalapakTotal +
+          blibliTotal +
+          shopeeTotal;
 
       log('Combined total: $combinedTotal');
 

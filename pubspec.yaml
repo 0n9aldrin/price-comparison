@@ -30,7 +30,6 @@ dependencies:
   pull_to_refresh: ^1.5.7
   image_picker: ^0.6.5
   animations: ^1.0.0+5
-  carousel_slider: ^2.1.0
   provider: ^4.1.2
   english_words: ^3.1.5
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'const.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 
 import 'websites/blibli.dart';
 
@@ -116,26 +115,6 @@ class DetailsPage extends StatelessWidget {
                       height: 30,
                     ),
                     Text('Price: RP$price'),
-                    FutureBuilder(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          return Text(snapshot.data);
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      },
-                      future: blibli.getDescription(),
-                    ),
-                    FutureBuilder(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          return Text(snapshot.data);
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      },
-                      future: blibli.getDescription(),
-                    ),
                   ],
                 ),
               ),

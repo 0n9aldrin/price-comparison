@@ -7,17 +7,18 @@ import 'combined.dart';
 import 'package:flutter/cupertino.dart';
 import 'const.dart';
 import 'home_page.dart';
+import 'simple_tab.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ColorsChange(),
+    return ChangeNotifierProvider<ColorChange>(
+      create: (context) => ColorChange(),
       child: MaterialApp(
         theme: ThemeData.light(),
-        home: SimpleTab(),
+        home: MyHomePage(),
       ),
     );
   }
