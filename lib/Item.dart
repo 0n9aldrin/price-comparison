@@ -226,8 +226,8 @@ class CombinedCard extends StatelessWidget {
       openContainer: openContainer,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[600]),
-//          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.purple),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -236,6 +236,9 @@ class CombinedCard extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20)),
                   color: Colors.grey[200],
                   image: DecorationImage(
                       image: NetworkImage(image), fit: BoxFit.fill),
@@ -271,7 +274,17 @@ class CombinedCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
-                children: stars,
+                children: <Widget>[
+                  Row(
+                    children: stars,
+                  ),
+                  Text(
+                    '($reviews)',
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 8.0),

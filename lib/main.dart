@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pricecomparison/combined_home.dart';
 import 'package:pricecomparison/product.dart';
 import 'package:pricecomparison/simple_tab.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       create: (context) => ColorChange(),
       child: MaterialApp(
         theme: ThemeData.light(),
-        home: MyHomePage(),
+        home: CombinedHome(),
       ),
     );
   }

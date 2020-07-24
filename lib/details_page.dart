@@ -27,151 +27,153 @@ class DetailsPage extends StatelessWidget {
     ];
     Blibli blibli = Blibli();
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-              child: Column(
-            children: [
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                ),
-              )
-            ],
-          )),
-          Container(
-            margin: EdgeInsets.only(top: 20),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Image(
-                image: NetworkImage(image),
-                fit: BoxFit.fill,
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 40),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: colors[website],
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }),
-                  IconButton(
-                      icon: Icon(
-                        Icons.share,
-                        color: colors[website],
-                      ),
-                      onPressed: () {})
-                ],
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Container(
-              height: 100,
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: shadowList,
-                  borderRadius: BorderRadius.circular(20)),
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 500,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: SingleChildScrollView(
-              child: Container(
-                width: double.infinity,
-                height: 500,
-                color: Colors.white,
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(
                 child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Text('Price: RP$price'),
+              children: [
+                Expanded(
+                  child: Container(
+                    color: Colors.white,
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: Colors.white,
+                  ),
+                )
+              ],
+            )),
+            Container(
+              margin: EdgeInsets.only(top: 20),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Image(
+                  image: NetworkImage(image),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 40),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: colors[website],
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
+                    IconButton(
+                        icon: Icon(
+                          Icons.share,
+                          color: colors[website],
+                        ),
+                        onPressed: () {})
                   ],
                 ),
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              height: 120,
-              child: Row(
-                children: [
-                  Container(
-                    height: 60,
-                    width: 70,
-                    decoration: BoxDecoration(
-                        color: colors[website],
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Icon(
-                      Icons.favorite_border,
-                      color: Colors.white,
-                    ),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                height: 100,
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: shadowList,
+                    borderRadius: BorderRadius.circular(20)),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 25.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  SizedBox(
-                    width: 10,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 500,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SingleChildScrollView(
+                child: Container(
+                  width: double.infinity,
+                  height: 500,
+                  color: Colors.white,
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text('Price: RP$price'),
+                    ],
                   ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        }
-                      },
-                      child: Container(
-                        height: 60,
-                        decoration: BoxDecoration(
-                            color: colors[website],
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(
-                            child: Text(
-                          'Go to website',
-                          style: TextStyle(color: Colors.white, fontSize: 24),
-                        )),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                height: 120,
+                child: Row(
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 70,
+                      decoration: BoxDecoration(
+                          color: colors[website],
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Icon(
+                        Icons.favorite_border,
+                        color: Colors.white,
                       ),
                     ),
-                  )
-                ],
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          }
+                        },
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                              color: colors[website],
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Center(
+                              child: Text(
+                            'Go to website',
+                            style: TextStyle(color: Colors.white, fontSize: 24),
+                          )),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    )),
               ),
-              decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
-                  )),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
